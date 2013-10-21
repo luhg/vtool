@@ -372,8 +372,8 @@ if __name__ == "__main__":
 #    import os
 
 #    file = sys.argv[1]
-    file = "iPOSCAR"
-    p = POSCAR(file)
+#    file = "iPOSCAR"
+#    p = POSCAR(file)
 #    g = GJF()
 #    poscar2gjf(p, g)
     pass
