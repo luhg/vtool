@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 #
-### modified date: 2013/07/26
+### modified date: 2013/10/21
 #
 
 from operator import itemgetter, attrgetter
+import copy
 
 class Atom:
     def __init__(self, element,
@@ -41,6 +42,37 @@ class Atom:
     def showAtom(self):
         print "%3s, %+14.10f, %+14.10f, %+14.10f, %4s, %4s, %4s" %(self._element_, self._xCoordinate_, self._yCoordinate_, self._zCoordinate_, self._xDynamic_, self._yDynamic_, self._zDynamic_)
 
+    def addCoordinate(self, x, y, z):
+        X = self._xCoordinate_ + x
+        Y = self._yCoordinate_ + y
+        Z = self._zCoordinate_ + z
+        return Atom(self._element_, X, Y, Z, self._xDynamic_, self._yDynamic_, self._zDynamic_)
+
+    def subCoordinate(self, x, y, z):
+        X = self._xCoordinate_ - x
+        Y = self._yCoordinate_ - y
+        Z = self._zCoordinate_ - z
+        return Atom(self._element_, X, Y, Z, self._xDynamic_, self._yDynamic_, self._zDynamic_)
+
+    def mulCoordinate(self, f):
+        X = self._xCoordinate_ * f
+        Y = self._yCoordinate_ * f
+        Z = self._zCoordinate_ * f
+        return Atom(self._element_, X, Y, Z, self._xDynamic_, self._yDynamic_, self._zDynamic_)
+
+    def divCoordinate(self, f):
+        X = self._xCoordinate_ / f
+        Y = self._yCoordinate_ / f
+        Z = self._zCoordinate_ / f
+        return Atom(self._element_, X, Y, Z, self._xDynamic_, self._yDynamic_, self._zDynamic_)
+
+#    def __add__(self, atom):
+#        x, y, z = atom.getCoordinate()
+#        X = self._xCoordinate_ + x
+#        Y = self._yCoordinate_ + y
+#        Z = self._zCoordinate_ + z
+#        newAtom = Atom(self._element_, X, Y, Z, self._xDynamic_, self._yDynamic_, self._zDynamic_)
+#        return newAtom
 
 class Lattice():
     def __init__(self, v1, v2, v3, constant = 1.0):
@@ -213,6 +245,18 @@ class POSCAR:
     def delAtom(self):
         pass
 
+    def setAtomElement(self, index, element):
+        self._atoms_[index].setElement(element)
+
+    def setAtomCoordinate(self, index, xCoordinate, yCoordinate, zCoordinate):
+        self._atoms_[index].setCoordinate(xCoordinate, yCoordinate, zCoordinate)
+
+    def setAtomDynamic(self, index, xDynamic, yDynamic, zDynamic):
+        self._atoms_[index].setDynamic(xDynamic, yDynamic, zDynamic)
+
+    def setAtom(self, index, atom):
+        self._atom_[index] = atom
+
     def listAtom(self):
         for a in self._atoms_:
             a.showAtom()
@@ -352,6 +396,9 @@ class POSCAR:
             f.close()
 #        self.listAtom()
 
+    def addPOSCARcoordindate(atoms):
+        pass
+
 def gjf2poscar(gjf, poscar):
     poscar.setLattice(gjf._lattice_.getVectors() )
     for a in gjf._atoms_:
@@ -367,13 +414,48 @@ def poscar2gjf(poscar, gjf, elements = None):
         a = Atom('Tv', v[0], v[1], v[2])
         gjf.addAtom(a)
 
+#def calcVector(coordinate1, coordinate2):
+#    x = coordinate1[0] - coordinate2[0]
+#    y = coordinate1[1] - coordinate2[1]
+#    z = coordinate1[2] - coordinate2[2]
+#    return (x, y, z)
+#def calcVector(init_atom, final_atom):
+#    ic = init_atom.getCoordinate()
+#    fc = final_atom.getCoordinate()
+#    x = fc[0] - ic[0]
+#    y = fc[1] - ic[1]
+#    z = fc[2] - ic[2]
+#    return (x, y, z)
+
+
 if __name__ == "__main__":
-#    import sys
-#    import os
+    import sys
+    import os
 
 #    file = sys.argv[1]
-#    file = "iPOSCAR"
-#    p = POSCAR(file)
+    file = "iPOSCAR"
+    p = POSCAR(file)
 #    g = GJF()
 #    poscar2gjf(p, g)
+
+#    line split
+    r_index = int('2') - 1
+    x, y, z = (4.0, 3.0, 2.0)
+
+    old_atm = p._atoms_[r_index]
+    new_atm = copy.copy(old_atm)
+#    new_atm.setElement('a')
+    new_atm.setCoordinate(x, y, z)
+
+#    print old_atm.getCoordinate()
+    new_atm = new_atm.addCoordinate(x, y, z)
+    print old_atm
+    print new_atm
+#    print calcVector(old_atm, new_atm)
+
+    print old_atm
+    p.setAtomElement(0, 'b')
+    p.writePOSCAR()
+#    angle split
+#    dihedral split
     pass
