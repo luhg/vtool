@@ -49,15 +49,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-#    import sys
-#    import os
-
-#    file = sys.argv[1]
-#    g = GJF(file)
-#    p = POSCAR()
-#    gjf2poscar(g, p)
-
-#    print p.getLattice().getVectors()
-
-#    p.writePOSCAR()
-
