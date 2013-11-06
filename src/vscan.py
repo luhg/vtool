@@ -145,6 +145,14 @@ def angleScan(poscar, angle, nstep, ref_indexes, mot_indexes, grp_indexes):
     return poscars
 
 
+def dihedralScan(poscar, angle, nstep, ref_indexes, mot_indexes, grp_indexes):
+# ref atm, fix/basic atm, mot atm
+    ref1_atm = poscar._atoms_[ref_indexes[0] ]
+    ref2_atm = poscar._atoms_[ref_indexes[1] ]
+    ref3_atm = poscar._atoms_[ref_indexes[2] ]
+    mot_atm = poscar._atoms_[mot_indexes[0] ]
+
+
 def makeScanJob(poscars):
     i = 0
     for p in poscars:
@@ -248,6 +256,9 @@ def main():
     elif len(r_indexes) == 2:
 #    angle scan
         poscars = angleScan(poscar, displacement, nstep, r_indexes, m_indexes, g_indexes)
+#    elif len(r_indexes) == 3:
+##    dihedral angle scan
+#        poscars = dihedralScan(poscar, displacement, nstep, r_indexes, m_indexes, g_indexes)
     else:
         print "input error of reference atom"
         sys.exit(2)
