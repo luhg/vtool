@@ -6,10 +6,26 @@
 from operator import itemgetter, attrgetter
 import copy
 
+__author__ = ""
+__date__ = "2013/10/21"
+
+__version__ = "$Revision: 0.1$"
+
+
 class Atom:
+    """ Atom basic info """
     def __init__(self, element,
                  xCoordinate, yCoordinate, zCoordinate,
                  xDynamic = 'T', yDynamic = 'T', zDynamic = 'T'):
+        """ set default argments
+            elelment:    atomic element
+            xCoordinate: x-axix coordinate
+            yCoordinate: y-axix coordinate
+            zCoordinate: z-axix coordinate
+            xDynamic:    x-axix (T)ranslate/(F)reeze
+            yDynamic:    y-axix (T)ranslate/(F)reeze
+            zDynamic:    z-axix (T)ranslate/(F)reeze
+        """
         self.setElement(element)
         self.setCoordinate(xCoordinate, yCoordinate, zCoordinate)
         self.setDynamic(xDynamic, yDynamic, zDynamic)
@@ -76,6 +92,12 @@ class Atom:
 
 class Lattice():
     def __init__(self, v1, v2, v3, constant = 1.0):
+        """ set default argment
+            v1:       lattice vector1  {Vector}
+            v2:       lattice vector2  {Vector}
+            v3:       lattice vector3  {Vector}
+            constant: lattice constant {Numver}
+        """
         self.setVectors(v1, v2, v3)
         self.setConstant(constant)
 
@@ -93,7 +115,10 @@ class Lattice():
 
 
 class GJF:
+    """ create/read Gaussian input file """
     def __init__(self, filename = None, comment = None):
+        """ 
+        """
         self._specs_ = []
 #        self._option_ = ''
         self.setOption()
@@ -152,6 +177,7 @@ class GJF:
         self._spin_ = spin
 
     def readGJF(self, filename):
+        """ read Gaussian input file """
         f = open(filename, "r")
         i = 0
         for l in f.readlines():
@@ -171,7 +197,7 @@ class GJF:
         self.sortAtoms()
 
     def writeGJF(self, filename = None):
-
+        """ write Gaussian input file """
         output = ''
         for l in self._specs_:
             output += l + "\n"
@@ -207,6 +233,7 @@ class GJF:
         self.setLattice(vectors)
 
 class POSCAR:
+    """ create/read VASP POSCAR """
     def __init__(self, filename = None, comment = None, lattice = None,
                  select="Selective", coordinate="Cartesian"):
 
@@ -400,12 +427,14 @@ class POSCAR:
         pass
 
 def gjf2poscar(gjf, poscar):
+    """ Gaussain GJF convert VASP POSCAR """
     poscar.setLattice(gjf._lattice_.getVectors() )
     for a in gjf._atoms_:
         poscar.addAtom(a)
 
 #def poscar2gjf(poscar, gjf, elements = ['A', 'B', 'C', 'D']):
 def poscar2gjf(poscar, gjf, elements = None):
+    """ VASP POSCAR convert Gaussain GJF """
     if elements != None:
         poscar.setElementsType(elements)
     for a in poscar._atoms_:
@@ -414,48 +443,13 @@ def poscar2gjf(poscar, gjf, elements = None):
         a = Atom('Tv', v[0], v[1], v[2])
         gjf.addAtom(a)
 
-#def calcVector(coordinate1, coordinate2):
-#    x = coordinate1[0] - coordinate2[0]
-#    y = coordinate1[1] - coordinate2[1]
-#    z = coordinate1[2] - coordinate2[2]
-#    return (x, y, z)
-#def calcVector(init_atom, final_atom):
-#    ic = init_atom.getCoordinate()
-#    fc = final_atom.getCoordinate()
-#    x = fc[0] - ic[0]
-#    y = fc[1] - ic[1]
-#    z = fc[2] - ic[2]
-#    return (x, y, z)
-
 
 if __name__ == "__main__":
     import sys
     import os
 
 #    file = sys.argv[1]
-    file = "iPOSCAR"
-    p = POSCAR(file)
+#    p = POSCAR(file)
 #    g = GJF()
 #    poscar2gjf(p, g)
-
-#    line split
-    r_index = int('2') - 1
-    x, y, z = (4.0, 3.0, 2.0)
-
-    old_atm = p._atoms_[r_index]
-    new_atm = copy.copy(old_atm)
-#    new_atm.setElement('a')
-    new_atm.setCoordinate(x, y, z)
-
-#    print old_atm.getCoordinate()
-    new_atm = new_atm.addCoordinate(x, y, z)
-    print old_atm
-    print new_atm
-#    print calcVector(old_atm, new_atm)
-
-    print old_atm
-    p.setAtomElement(0, 'b')
-    p.writePOSCAR()
-#    angle split
-#    dihedral split
     pass
