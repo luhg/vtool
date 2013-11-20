@@ -136,7 +136,6 @@ if __name__ == "__main__":
     import sys
     import os
 
-    g = GJF('g.gjf')
-    g.writeGJF()
-
+#    g = GJF('g.gjf')
+#    g.writeGJF()
     pass

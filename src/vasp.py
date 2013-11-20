@@ -36,6 +36,10 @@ class POSCAR:
         return self._comment_
 
     def setLattice(self, vectors, latticeConstant = 1.0):
+        """ set lattice
+            vectors:         lattice vectors {vector array}
+            latticeConstant:                 {number}
+        """
         v1 = vectors[0]
         v2 = vectors[1]
         v3 = vectors[2]
