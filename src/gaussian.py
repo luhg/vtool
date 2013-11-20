@@ -118,9 +118,12 @@ class GJF:
         vectors = []
         for atom in self._atoms_:
             if atom.getElement() == "Tv":
-#                (x, y, z) = atom.getCoordinate()
-#                vectors.append([x, y, z])
-                vectors.append(atom.getCoordinate() )
+##                (x, y, z) = atom.getCoordinate()
+##                vectors.append([x, y, z])
+#                vectors.append(atom.getCoordinate() )
+                tc1, tc2, tc3 = atom.getCoordinate()
+                tmpVec = Vector(tc1, tc2, tc3)
+                vectors.append(tmpVec)
                 lattice_indexes.append(i)
             i += 1
         lattice_indexes.reverse()
@@ -132,5 +135,8 @@ class GJF:
 if __name__ == "__main__":
     import sys
     import os
+
+    g = GJF('g.gjf')
+    g.writeGJF()
 
     pass

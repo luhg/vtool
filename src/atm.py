@@ -94,7 +94,7 @@ class Lattice():
             v1:       lattice vector1  {Vector}
             v2:       lattice vector2  {Vector}
             v3:       lattice vector3  {Vector}
-            constant: lattice constant {Numver}
+            constant: lattice constant {Number}
         """
         self.setVectors(v1, v2, v3)
         self.setConstant(constant)

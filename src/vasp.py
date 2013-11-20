@@ -114,7 +114,9 @@ class POSCAR:
         # setup lattice vector
         for i in range(3):
             l = f.readline().rstrip()
-            vectors.append((float(l.split()[0]), float(l.split()[1]), float(l.split()[2]) ) )
+            tmpVec = Vector(float(l.split()[0]), float(l.split()[1]), float(l.split()[2]) )
+            vectors.append(tmpVec)
+#            vectors.append((float(l.split()[0]), float(l.split()[1]), float(l.split()[2]) ) )
         self.setLattice(vectors, latticeConstant)
 
         # setup number of element type
@@ -156,8 +158,6 @@ class POSCAR:
 
         f.close()
 
-        pass
-
     def writePOSCAR(self, filename = None):
         comment = ''
         numberOfAtom = ''
@@ -166,9 +166,9 @@ class POSCAR:
             numberOfAtom += ' ' + str(es.values()[0])
 
         l = self._lattice_.getVectors()
-        v1 = l[0]
-        v2 = l[1]
-        v3 = l[2]
+        v11, v12, v13 = l[0].getBasis()
+        v21, v22, v23 = l[1].getBasis()
+        v31, v32, v33 = l[2].getBasis()
         format1 = '''%s
 %.10f
 %+14.10f %+14.10f %+14.10f
@@ -176,9 +176,10 @@ class POSCAR:
 %+14.10f %+14.10f %+14.10f
 '''
         output1 = format1 % (self._comment_ + comment, self._lattice_.getConstant(),
-                             l[0][0], l[0][1], l[0][2],
-                             l[1][0], l[1][1], l[1][2],
-                             l[2][0], l[2][1], l[2][2])
+                             v11, v12, v13,
+                             v21, v22, v23,
+                             v31, v32, v33)
+
 
         output2 = numberOfAtom + "\n"
 #        output += numberOfAtom + "\n"
@@ -209,4 +210,6 @@ if __name__ == "__main__":
     import sys
     import os
 
+#    p = POSCAR('POSCAR')
+#    p.writePOSCAR()
     pass

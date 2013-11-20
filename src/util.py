@@ -34,7 +34,8 @@ def poscar2gjf(poscar, gjf, elements = None):
     for a in poscar._atoms_:
         gjf.addAtom(a)
     for v in poscar.getLattice().getVectors():
-        a = Atom('Tv', v[0], v[1], v[2])
+        tmp1, tmp2, tmp3 = v.getBasis()
+        a = Atom('Tv', tmp1, tmp2, tmp3)
         gjf.addAtom(a)
 
 
