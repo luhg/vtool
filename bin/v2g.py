@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 #
-### modified date: 2013/07/26
+### modified date: 2013/11/21
 #
 
 import sys, os, getopt
-from vtool.atm import *
+from vtool.util import *
 
 def main():
     def usage():
@@ -41,8 +41,7 @@ def main():
     g = GJF()
     len(sys.argv)
     poscar2gjf(p, g)
-#    g.writeGJF()
-#       print p.getLattice().getVectors()
+
     if outfile is None:
         g.writeGJF()
     else:

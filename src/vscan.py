@@ -5,85 +5,8 @@
 
 from atm import *
 import copy
-import math
 import os, getopt
 import sys
-
-class Vector:
-    def __init__(self, x, y, z):
-        self.setBasis(x, y, z)
-
-    def setBasis(self, x, y, z):
-        self._x_ = x
-        self._y_ = y
-        self._z_ = z
-
-    def getBasis(self):
-        return (self._x_, self._y_, self._z_)
-
-    def normalized(self):
-        length = self.getLength()
-        if length == 0.0:
-            print "Don't normalized"
-            return Vector(self._x_, self._y_, self._z_)
-        else:
-            return Vector(self._x_ / length, self._y_ / length, self._z_ / length)
-
-    def getLength(self):
-        self._length_ = self._x_ * self._x_ + self._y_ * self._y_ + self._z_ * self._z_
-        self._length_ = math.sqrt(self._length_)
-        return self._length_
-
-    def getAngle(self, vector):
-        angle = math.acos(self.dot(vector) / self.getLength() / vector.getLength() )
-        return math.degrees(angle)
-
-    def dot(self, vector):
-        return self._x_ * vector._x_ + self._y_ * vector._y_ + self._z_ * vector._z_
-
-    def cross(self, vector):
-        x = self._y_ * vector._z_ - self._z_ * vector._y_
-        y = self._z_ * vector._x_ - self._x_ * vector._z_
-        z = self._x_ * vector._y_ - self._y_ * vector._x_
-        return Vector(x, y, z)
-
-    def __str__(self):
-        return "%f, %f, %f" %(self._x_, self._y_, self._z_)
-
-    def __add__(self, vector):
-        return Vector(self._x_ + vector._x_, self._y_ + vector._y_, self._z_ + vector._z_)
-
-    def __sub__(self, vector):
-        return Vector(self._x_ - vector._x_, self._y_ - vector._y_, self._z_ - vector._z_)
-
-    def __mul__(self, n):
-        return Vector(n * self._x_, n * self._y_, n * self._z_)
-
-# Rotation operator
-#      cosQ+Nx^2(1-cosQ)        NxNy(1-cosQ) - Nz*sinQ   NxNz(1-cosQ) + Ny*sinQ     x1   x2   x3
-# R =  NyNz(1-cosQ) + Nz*sinQ   cosQ + Ny^2(1-cosQ)      NyNz(1-cosQ) - Nz*sinQ  =  y1   y2   y3
-#      NzNx(1-cosQ) - Ny*sinQ   NzNy(1-cosQ) + NxsinQ    cosQ + Nz^2(1-csoQ)a       z1   z2   z3
-#
-# angle degree to radian
-#    def rotate(axis_vector, angle):
-    def rotate(self, axis_vector, angle):
-        angle = math.radians(angle)
-        x1 = math.cos(angle) + axis_vector._x_ * axis_vector._x_ * (1 -math.cos(angle) )
-        x2 = axis_vector._x_ * axis_vector._y_ * (1 - math.cos(angle) ) - axis_vector._z_ * math.sin(angle)
-        x3 = axis_vector._x_ * axis_vector._z_ * (1 - math.cos(angle) ) + axis_vector._y_ * math.sin(angle)
-
-        y1 = axis_vector._y_ * axis_vector._z_ * (1- math.cos(angle) ) + axis_vector._z_ * math.sin(angle)
-        y2 = math.cos(angle) + axis_vector._y_ * axis_vector._y_ * (1- math.cos(angle) )
-        y3 = axis_vector._y_ * axis_vector._z_ * (1- math.cos(angle) ) - axis_vector._z_ * math.sin(angle)
-
-        z1 = axis_vector._z_ * axis_vector._x_ * (1- math.cos(angle) ) - axis_vector._y_ * math.sin(angle)
-        z2 = axis_vector._z_ * axis_vector._y_ * (1- math.cos(angle) ) + axis_vector._x_ * math.sin(angle)
-        z3 = math.cos(angle) + axis_vector._z_ * axis_vector._z_ * (1- math.cos(angle) )
-
-        x = x1 * self._x_ + x2 * self._y_ + x3 * self._z_
-        y = y1 * self._x_ + y2 * self._y_ + y3 * self._z_
-        z = z1 * self._x_ + z2 * self._y_ + z3 * self._z_
-        return Vector(x, y, z)
 
 
 def lineScan(poscar, distance, nstep, ref_indexes, mot_indexes, grp_indexes):
@@ -99,7 +22,7 @@ def lineScan(poscar, distance, nstep, ref_indexes, mot_indexes, grp_indexes):
 
     for i in xrange(nstep + 1):
         v = vec*i*distance
-        tmpPOSCAR = copy.deepcopy(poscar)
+        tmpPOSCAR = cpy.deepcopy(poscar)
 #        x, y, z = v.getBasis()
 #        tmpPOSCAR.setAtomCoordinate(mot_indexes[0], x2+x, y2 + y, z2 + z)
 
