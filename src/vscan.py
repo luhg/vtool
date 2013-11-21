@@ -75,6 +75,35 @@ def dihedralScan(poscar, angle, nstep, ref_indexes, mot_indexes, grp_indexes):
     ref3_atm = poscar._atoms_[ref_indexes[2] ]
     mot_atm = poscar._atoms_[mot_indexes[0] ]
 
+    x1, y1, z1 = ref1_atm.getCoordinate()
+    x2, y2, z2 = ref2_atm.getCoordinate()
+    x3, y3, z3 = ref3_atm.getCoordinate()
+    x4, y4, z4 = mot_atm.getCoordinate()
+
+    vec1 = Vector(x1 - x2, y1 - y2, z1 - z2)
+    vec2 = Vector(x3 - x2, y3 - y2, z3 - z2)
+    vec3 = Vector(x2 - x3, y2 - y3, z2 - z3)
+    vec4 = Vector(x4 - x3, y4 - y3, z4 - z3)
+
+    normal_vec1 = vec1.cross(vec2)
+    normal_vec2 = vec3.cross(vec4)
+    normal_vec3 = normal_vec1.cross(normal_vec2)
+
+    poscars = []
+    tmpIndexes = mot_indexes + grp_indexes
+
+    for i in xrange(nstep):
+        a = i * angle
+        tmpPOSCAR = copy.deepcopy(poscar)
+
+        for j in tmpIndexes:
+            tmpX, tmpY, tmpZ = poscar._atoms_[j].getCoordinate()
+            tmpV = Vector(tmpX - x3, tmpY - y3, tmpZ - z3)
+            tmpV = tmpV.rotate(normal_vec3, a)
+            tmpX, tmpY, tmpZ = tmpV.getBasis()
+            tmpPOSCAR.setAtomCoordinate(j, tmpX + x3, tmpY + y3, tmpZ + z3)
+        poscars.append(tmpPOSCAR)
+    return poscars
 
 def makeScanJob(poscars):
     i = 0
@@ -180,9 +209,9 @@ def main():
     elif len(r_indexes) == 2:
 #    angle scan
         poscars = angleScan(poscar, displacement, nstep, r_indexes, m_indexes, g_indexes)
-#    elif len(r_indexes) == 3:
-##    dihedral angle scan
-#        poscars = dihedralScan(poscar, displacement, nstep, r_indexes, m_indexes, g_indexes)
+    elif len(r_indexes) == 3:
+#    dihedral angle scan
+        poscars = dihedralScan(poscar, displacement, nstep, r_indexes, m_indexes, g_indexes)
     else:
         print "input error of reference atom"
         sys.exit(2)
