@@ -3,7 +3,7 @@
 ### modified date: 2013/10/23
 #
 
-from atm import *
+from vasp import *
 import copy
 import os, getopt
 import sys
@@ -22,17 +22,15 @@ def lineScan(poscar, distance, nstep, ref_indexes, mot_indexes, grp_indexes):
 
     for i in xrange(nstep + 1):
         v = vec*i*distance
-        tmpPOSCAR = cpy.deepcopy(poscar)
-#        x, y, z = v.getBasis()
+        tmpPOSCAR = copy.deepcopy(poscar)
+        x, y, z = v.getBasis()
 #        tmpPOSCAR.setAtomCoordinate(mot_indexes[0], x2+x, y2 + y, z2 + z)
 
-        for j in grp_indexes:
+        for j in tmpIndexes:
             tmpX, tmpY, tmpZ = poscar._atoms_[j].getCoordinate()
-            tmpPOSCAR.setAtomCoordinate(j, tmpX+x, tmpY+y, tmpZ+z)
+            tmpPOSCAR.setAtomCoordinate(j, tmpX + x, tmpY + y, tmpZ + z)
 #            tmpX, tmpY, tmpZ = poscar._atoms_[j-1].getCoordinate()
 #            tmpPOSCAR.setAtomCoordinate(j-1, tmpX+x, tmpY+y, tmpZ+z)
-
-#        print i, x, y, z
         poscars.append(tmpPOSCAR)
     return poscars
 
@@ -191,7 +189,7 @@ def main():
         g_indexes = sys.stdin.readline().rstrip()
         g_indexes = [int(i)-1 for i in g_indexes.split(',')]
 
-    print r_indexes, m_indexes, g_indexes
+#    print r_indexes, m_indexes, g_indexes
 
     if nstep is None:
         print "number of step: "

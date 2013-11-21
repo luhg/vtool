@@ -40,6 +40,9 @@ class GJF:
         return self._lattice_
 
     def setLattice(self, vectors, latticeConstant = 1.0):
+        """ set lattice
+            vectors: {Vector array}
+        """
         v1 = vectors[0]
         v2 = vectors[1]
         v3 = vectors[2]

@@ -33,10 +33,11 @@ def poscar2gjf(poscar, gjf, elements = None):
         poscar.setElementsType(elements)
     for a in poscar._atoms_:
         gjf.addAtom(a)
-    for v in poscar.getLattice().getVectors():
-        tmp1, tmp2, tmp3 = v.getBasis()
-        a = Atom('Tv', tmp1, tmp2, tmp3)
-        gjf.addAtom(a)
+    gjf.setLattice(poscar.getLattice().getVectors() )
+#    for v in poscar.getLattice().getVectors():
+#        tmp1, tmp2, tmp3 = v.getBasis()
+#        a = Atom('Tv', tmp1, tmp2, tmp3)
+#        gjf.addAtom(a)
 
 
 if __name__ == "__main__":
