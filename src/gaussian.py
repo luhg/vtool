@@ -26,7 +26,7 @@ class GJF:
         self._elements_ = []
         self._element_lists_ = []
         self._numbers_ = []
-#        self._lattices_ =  []
+        self._lattice_ = None
         if not(filename is None):
             self.readGJF(filename)
 
@@ -90,8 +90,9 @@ class GJF:
             elif len(l.split()) == 4:
                  atom = Atom(l.split()[0], float(l.split()[1]), float(l.split()[2]), float(l.split()[3]) )
                  self.addAtom(atom)
-        self._checkLattice_()
         self.sortAtoms()
+        self._checkLattice_()
+#        self.sortAtoms()
 
     def writeGJF(self, filename = None):
         """ write Gaussian input file """
@@ -103,6 +104,14 @@ class GJF:
         output += '%i %i\n' %(self._charge_, self._spin_)
         for a in self._atoms_:
             output += "%-2s" % a.getElement() + "       %13.8f    %13.8f    %13.8f\n" % a.getCoordinate()
+
+        if isinstance(self._lattice_, Lattice):
+            for v in self._lattice_.getVectors():
+                v1, v2, v3 = v.getBasis()
+                output += "Tv       %13.8f    %13.8f    %13.8f\n" %(v1, v2, v3)
+#        for l in self._lattice_:
+#        for a in self.getLattice():
+#            output += " Tv       %13.8f    %13.8f    %13.8f\n" % a.getCoordinate()
 
         # setup output
         if filename == None:
@@ -126,16 +135,17 @@ class GJF:
                 vectors.append(tmpVec)
                 lattice_indexes.append(i)
             i += 1
-        lattice_indexes.reverse()
-        for l in lattice_indexes:
-            self._atoms_.pop(l)
-#        self._lattice_ = Lattice(vectors[0], vectors[1], vectors[2])
-        self.setLattice(vectors)
+        if len(lattice_indexes) == 3:
+            lattice_indexes.reverse()
+            for l in lattice_indexes:
+                self._atoms_.pop(l)
+#            self._lattice_ = Lattice(vectors[0], vectors[1], vectors[2])
+            self.setLattice(vectors)
 
 if __name__ == "__main__":
     import sys
     import os
 
-#    g = GJF('g.gjf')
-#    g.writeGJF()
+    g = GJF('g.gjf')
+    g.writeGJF()
     pass

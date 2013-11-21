@@ -89,8 +89,9 @@ def makeScanJob(poscars):
 
 def main():
     def usage():
-        print "Usage: vscan -i POSCAR -r 1   -m 2 -g 3,4,5 -n 4 -d 1.0     # line  scan"
-        print "       vscan -i POSCAR -r 1,2 -m 3 -g 4,5,6 -n 4 -d 30.0    # angle scan"
+        print "Usage: vscan -i POSCAR -r 1     -m 2 -g 3,4,5 -n 4 -d 1.0     # line  scan"
+        print "       vscan -i POSCAR -r 1,2   -m 3 -g 4,5,6 -n 4 -d 30.0    # angle scan"
+        print "       vscan -i POSCAR -r 1,2,3 -m 4 -g 5,6,7 -n 4 -d 30.0    # dihedral scan"
         print " -h : help"
         print " -i : input file, POSCAR"
         print " -r : reference atoms"
