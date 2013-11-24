@@ -4,6 +4,7 @@
 #
 
 from atm import *
+import re
 
 __author__ = ""
 __date__ = "2013/11/21"
@@ -210,9 +211,112 @@ class POSCAR:
     def addPOSCARcoordindate(atoms):
         pass
 
+
+class OUTCAR:
+    def __init__(self, filename = 'OUTCAR'):
+        self._elements_ = []
+        self._dynamicMatrixes_ = []
+        self.readOUTCAT(filename)
+
+    def readOUTCAT(self, filename):
+        f = open(filename)
+        l = ' '
+        reSpace = re.compile('^\s+?$')
+#        reSpace = re.compile('^\s+?$')
+        rePOTCAR = re.compile('^\s+?POTCAR:\s+?(\w+)\s+?(\w+)\s+?(\w+)')
+#        rePosition = re.compile(' position of ions in cartesian coordinates  (Angst):')
+        rePosition = re.compile('^\s+?position of ions in cartesian coordinates')
+#        rePosition2 = re.compile('^\s+?(\w+)\s+?(\w+)\s+?(\w+)')
+        reDynMat = re.compile('Eigenvectors and eigenvalues of the dynamical matrix')
+
+#        for l in f.readlines():
+#            print l
+        totalAtomNumber = 0
+        while l:
+            l = f.readline()
+            # Get potcar
+            if rePOTCAR.search(l):
+                r = rePOTCAR.match(l)
+                e1, e2, e3 = r.groups()
+#                print l, e1, e2, e3
+                element = {'potential': e1, 'element': e2, 'date': e3}
+                self._elements_.append(element)
+
+            # Get atom position
+            if rePosition.match(l):
+#                print l.rstrip()
+                l = f.readline()
+                while not reSpace.search(l):
+                    l = f.readline()
+#                    print l.rstrip(), totalAtomNumber
+                    totalAtomNumber += 1
+                    
+
+            # Get dynamical matrix
+            if reDynMat.search(l):
+                l = f.readline()
+                while not reDynMat.search(l):
+                    tmpArray = l.split()
+                    # Get image freq
+                    if len(tmpArray) == 10:
+                        freq = {"THz": tmpArray[2],
+                                "2PiTHz": tmpArray[4],
+                                "cm-1": tmpArray[6],
+                                "meV": tmpArray[8]}
+                        atoms = []
+                        l = f.readline()
+                        tmpArray = l.split()
+
+                        while len(tmpArray) == 6:
+                            if tmpArray[0] == 'X':
+                                l = f.readline()
+                                tmpArray = l.split()
+                            else:
+                                tmpAtm = Atom(element = 0,
+                                              xCoordinate = float(tmpArray[0]), yCoordinate = float(tmpArray[1]), zCoordinate = float(tmpArray[2]),
+                                              xDisplace = float(tmpArray[3]), yDisplace = float(tmpArray[4]), zDisplace = float(tmpArray[3]) )
+                                l = f.readline()
+                                tmpArray = l.split()
+                                atoms.append(tmpAtm)
+#                            print l.rstrip()
+                        self._dynamicMatrixes_.append({"freq": freq, "atoms": atoms})
+
+                    # Get real freq
+                    elif len(tmpArray) == 11:
+                        freq = {"THz": tmpArray[3],
+                                "2PiTHz": tmpArray[5],
+                                "cm-1": tmpArray[7],
+                                "meV": tmpArray[9]}
+                        atoms = []
+                        l = f.readline()
+                        tmpArray = l.split()
+
+                        while len(tmpArray) == 6:
+                            if tmpArray[0] == 'X':
+                                l = f.readline()
+                                tmpArray = l.split()
+                            else:
+                                tmpAtm = Atom(element = 0,
+                                              xCoordinate = float(tmpArray[0]), yCoordinate = float(tmpArray[1]), zCoordinate = float(tmpArray[2]),
+                                              xDisplace = float(tmpArray[3]), yDisplace = float(tmpArray[4]), zDisplace = float(tmpArray[3]) )
+                                l = f.readline()
+                                tmpArray = l.split()
+                                atoms.append(tmpAtm)
+#                            print l.rstrip()
+                        self._dynamicMatrixes_.append({"freq": freq, "atoms": atoms})
+ 
+                    l = f.readline()
+                
+        f.close()
+#        print totalAtomNumber
+        pass
+
+
 if __name__ == "__main__":
     import sys
     import os
+
+    o = OUTCAR('OUTCAR')
 
 #    p = POSCAR('POSCAR')
 #    p.writePOSCAR()
