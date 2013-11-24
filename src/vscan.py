@@ -187,9 +187,10 @@ def main():
         m_indexes = [int(i)-1 for i in m_indexes.split(',')]
 
     if g_indexes is None:
-        print "group atoms: "
-        g_indexes = sys.stdin.readline().rstrip()
-        g_indexes = [int(i)-1 for i in g_indexes.split(',')]
+#        print "group atoms: "
+#        g_indexes = sys.stdin.readline().rstrip()
+#        g_indexes = [int(i)-1 for i in g_indexes.split(',')]
+        g_indexes = []
 
     print r_indexes, m_indexes, g_indexes
 
