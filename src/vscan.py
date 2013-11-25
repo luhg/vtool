@@ -1,107 +1,14 @@
 #!/usr/bin/env python
-#
-### modified date: 2013/10/23
-#
 
 from vasp import *
-import copy
 import os, getopt
 import sys
 
+__author__ = ""
+__date__ = "2013/11/25"
 
-def lineScan(poscar, distance, nstep, ref_indexes, mot_indexes, grp_indexes):
-    ref_atm = poscar._atoms_[ref_indexes[0]]
-    mot_atm = poscar._atoms_[mot_indexes[0]]
-    x1, y1, z1 = ref_atm.getCoordinate()
-    x2, y2, z2 = mot_atm.getCoordinate()
-    vec = Vector(x2-x1, y2-y1, z2-z1)
-    vec = vec.normalized()
+__version__ = "$Revision: 0.1$"
 
-    poscars = []
-    tmpIndexes = mot_indexes + grp_indexes
-
-    for i in xrange(nstep + 1):
-        v = vec*i*distance
-        tmpPOSCAR = copy.deepcopy(poscar)
-        x, y, z = v.getBasis()
-#        tmpPOSCAR.setAtomCoordinate(mot_indexes[0], x2+x, y2 + y, z2 + z)
-
-        for j in tmpIndexes:
-            tmpX, tmpY, tmpZ = poscar._atoms_[j].getCoordinate()
-            tmpPOSCAR.setAtomCoordinate(j, tmpX + x, tmpY + y, tmpZ + z)
-#            tmpX, tmpY, tmpZ = poscar._atoms_[j-1].getCoordinate()
-#            tmpPOSCAR.setAtomCoordinate(j-1, tmpX+x, tmpY+y, tmpZ+z)
-        poscars.append(tmpPOSCAR)
-    return poscars
-
-
-def angleScan(poscar, angle, nstep, ref_indexes, mot_indexes, grp_indexes):
-# ref atm, fix/basic atm, mot atm
-    ref_atm = poscar._atoms_[ref_indexes[0] ]
-    bas_atm = poscar._atoms_[ref_indexes[1] ]
-    mot_atm = poscar._atoms_[mot_indexes[0] ]
-
-    x1, y1, z1 = ref_atm.getCoordinate()
-    x2, y2, z2 = bas_atm.getCoordinate()
-    x3, y3, z3 = mot_atm.getCoordinate()
-    vec1 = Vector(x1 - x2, y1 - y2, z1 - z2)
-    vec2 = Vector(x3 - x2, y3 - y2, z3 - z2)
-    normal_vector = vec1.cross(vec2)
-
-    poscars = []
-    tmpIndexes = mot_indexes + grp_indexes
-
-    for i in xrange(nstep):
-        a = i * angle
-        tmpPOSCAR = copy.deepcopy(poscar)
-
-#        for j in grp_indexes:
-        for j in tmpIndexes:
-            tmpX, tmpY, tmpZ = poscar._atoms_[j].getCoordinate()
-            tmpV = Vector(tmpX - x2, tmpY - y2, tmpZ - z2)
-            tmpV = tmpV.rotate(normal_vector, a)
-            tmpX, tmpY, tmpZ = tmpV.getBasis()
-            tmpPOSCAR.setAtomCoordinate(j, tmpX + x2, tmpY + y2, tmpZ + z2)
-        poscars.append(tmpPOSCAR)
-    return poscars
-
-
-def dihedralScan(poscar, angle, nstep, ref_indexes, mot_indexes, grp_indexes):
-# ref atm, fix/basic atm, mot atm
-    ref1_atm = poscar._atoms_[ref_indexes[0] ]
-    ref2_atm = poscar._atoms_[ref_indexes[1] ]
-    ref3_atm = poscar._atoms_[ref_indexes[2] ]
-    mot_atm = poscar._atoms_[mot_indexes[0] ]
-
-    x1, y1, z1 = ref1_atm.getCoordinate()
-    x2, y2, z2 = ref2_atm.getCoordinate()
-    x3, y3, z3 = ref3_atm.getCoordinate()
-    x4, y4, z4 = mot_atm.getCoordinate()
-
-    vec1 = Vector(x1 - x2, y1 - y2, z1 - z2)
-    vec2 = Vector(x3 - x2, y3 - y2, z3 - z2)
-    vec3 = Vector(x2 - x3, y2 - y3, z2 - z3)
-    vec4 = Vector(x4 - x3, y4 - y3, z4 - z3)
-
-    normal_vec1 = vec1.cross(vec2)
-    normal_vec2 = vec3.cross(vec4)
-    normal_vec3 = normal_vec1.cross(normal_vec2)
-
-    poscars = []
-    tmpIndexes = mot_indexes + grp_indexes
-
-    for i in xrange(nstep):
-        a = i * angle
-        tmpPOSCAR = copy.deepcopy(poscar)
-
-        for j in tmpIndexes:
-            tmpX, tmpY, tmpZ = poscar._atoms_[j].getCoordinate()
-            tmpV = Vector(tmpX - x3, tmpY - y3, tmpZ - z3)
-            tmpV = tmpV.rotate(normal_vec3, a)
-            tmpX, tmpY, tmpZ = tmpV.getBasis()
-            tmpPOSCAR.setAtomCoordinate(j, tmpX + x3, tmpY + y3, tmpZ + z3)
-        poscars.append(tmpPOSCAR)
-    return poscars
 
 def makeScanJob(poscars):
     i = 0
@@ -204,13 +111,13 @@ def main():
 
     if len(r_indexes) == 1:
 #    line scan
-        poscars = lineScan(poscar, displacement, nstep, r_indexes, m_indexes, g_indexes)
+        poscars = poscar.lineScan(displacement, nstep, r_indexes, m_indexes, g_indexes)
     elif len(r_indexes) == 2:
 #    angle scan
-        poscars = angleScan(poscar, displacement, nstep, r_indexes, m_indexes, g_indexes)
+        poscars = poscar.angleScan(displacement, nstep, r_indexes, m_indexes, g_indexes)
     elif len(r_indexes) == 3:
 #    dihedral angle scan
-        poscars = dihedralScan(poscar, displacement, nstep, r_indexes, m_indexes, g_indexes)
+        poscars = poscar.dihedralScan(displacement, nstep, r_indexes, m_indexes, g_indexes)
     else:
         print "input error of reference atom"
         sys.exit(2)
@@ -220,19 +127,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-#    file = "iPOSCAR"
-#    poscar = POSCAR(file)
-
-#    dihedral angle split
-#   r: reference atom
-#   m: motion atom
-#   m_angle: motion angle
-#   nstep: number of step
-#   input
-#    ref_indexes = [0, 1, 2]
-#    mot_indexes = [3]
-#    grp_indexes = [4, 5]
-#    nstep = 8
-#    angle = 90.0
-#
 

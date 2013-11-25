@@ -1,14 +1,12 @@
 #!/usr/bin/env python
-#
-### modified date: 2013/10/21
-#
 
 from atm import *
+import copy
 
 __author__ = ""
-__date__ = "2013/11/21"
+__date__ = "2013/11/25"
 
-__version__ = "$Revision: 0.1$"
+__version__ = "$Revision: 0.2$"
 
 
 class POSCAR:
@@ -28,7 +26,6 @@ class POSCAR:
         if not(filename is None):
             self.readPOSCAR(filename)
 
-   
     def setComment(self, comment):
         self._comment_ = comment
         
@@ -65,7 +62,7 @@ class POSCAR:
         self._atoms_[index].setDynamic(xDynamic, yDynamic, zDynamic)
 
     def setAtom(self, index, atom):
-        self._atom_[index] = atom
+        self._atoms_[index] = atom
 
     def listAtom(self):
         for a in self._atoms_:
@@ -94,7 +91,6 @@ class POSCAR:
             for j in range(es[i].values()[0] ):
                 self._atoms_[n].setElement(elements[i])
                 n += 1
-#        self.writePOSCAR()
 
     def setSelectiveMode(self, mode):
         self._selectiveMode_ = mode
@@ -207,8 +203,131 @@ class POSCAR:
             f.close()
 #        self.listAtom()
 
+    def lineScan(self, distance, nstep, ref_indexes, mot_indexes, grp_indexes):
+        """ line scan
+            distance:              {float}
+            nstep:                 {int}
+            reference atom index:  {int array}
+            motion atom index:     {int array}
+            group atom index:      {int array}
+        """
+        ref_atm = self._atoms_[ref_indexes[0]]
+        mot_atm = self._atoms_[mot_indexes[0]]
+        x1, y1, z1 = ref_atm.getCoordinate()
+        x2, y2, z2 = mot_atm.getCoordinate()
+        vec = Vector(x2-x1, y2-y1, z2-z1)
+        vec = vec.normalized()
+    
+        poscars = []
+        tmpIndexes = mot_indexes + grp_indexes
+    
+        for i in xrange(nstep + 1):
+            v = vec*i*distance
+#            tmpPOSCAR = copy.deepcopy(poscar)
+            tmpPOSCAR = POSCAR(comment = self._comment_, select = self._selectiveMode_, coordinate = self._coorndinateType_)
+            tmpPOSCAR._lattice_ = copy.deepcopy(self._lattice_)
+            tmpPOSCAR._atoms_ = copy.deepcopy(self._atoms_)
+            x, y, z = v.getBasis()
+    #        tmpPOSCAR.setAtomCoordinate(mot_indexes[0], x2+x, y2 + y, z2 + z)
+    
+            for j in tmpIndexes:
+                tmpX, tmpY, tmpZ = self._atoms_[j].getCoordinate()
+                tmpPOSCAR.setAtomCoordinate(j, tmpX + x, tmpY + y, tmpZ + z)
+    #            tmpX, tmpY, tmpZ = poscar._atoms_[j-1].getCoordinate()
+    #            tmpPOSCAR.setAtomCoordinate(j-1, tmpX+x, tmpY+y, tmpZ+z)
+            poscars.append(tmpPOSCAR)
+        return poscars
+
+    def angleScan(self, angle, nstep, ref_indexes, mot_indexes, grp_indexes):
+        """ angle scan
+            angle:                 {float}
+            nstep:                 {int}
+            reference atom index:  {int array}
+            motion atom index:     {int array}
+            group atom index:      {int array}
+        """
+    # ref atm, fix/basic atm, mot atm
+        ref_atm = self._atoms_[ref_indexes[0] ]
+        bas_atm = self._atoms_[ref_indexes[1] ]
+        mot_atm = self._atoms_[mot_indexes[0] ]
+    
+        x1, y1, z1 = ref_atm.getCoordinate()
+        x2, y2, z2 = bas_atm.getCoordinate()
+        x3, y3, z3 = mot_atm.getCoordinate()
+        vec1 = Vector(x1 - x2, y1 - y2, z1 - z2)
+        vec2 = Vector(x3 - x2, y3 - y2, z3 - z2)
+        normal_vector = vec1.cross(vec2)
+    
+        poscars = []
+        tmpIndexes = mot_indexes + grp_indexes
+    
+        for i in xrange(nstep):
+            a = i * angle
+#            tmpPOSCAR = copy.deepcopy(poscar)
+            tmpPOSCAR = POSCAR(comment = self._comment_, select = self._selectiveMode_, coordinate = self._coorndinateType_)
+            tmpPOSCAR._lattice_ = copy.deepcopy(self._lattice_)
+            tmpPOSCAR._atoms_ = copy.deepcopy(self._atoms_)
+    
+    #        for j in grp_indexes:
+            for j in tmpIndexes:
+                tmpX, tmpY, tmpZ = poscar._atoms_[j].getCoordinate()
+                tmpV = Vector(tmpX - x2, tmpY - y2, tmpZ - z2)
+                tmpV = tmpV.rotate(normal_vector, a)
+                tmpX, tmpY, tmpZ = tmpV.getBasis()
+                tmpPOSCAR.setAtomCoordinate(j, tmpX + x2, tmpY + y2, tmpZ + z2)
+            poscars.append(tmpPOSCAR)
+        return poscars
+
+    def dihedralScan(self, angle, nstep, ref_indexes, mot_indexes, grp_indexes):
+        """ dihedral scan
+            angle:                 {float}
+            nstep:                 {int}
+            reference atom index:  {int array}
+            motion atom index:     {int array}
+            group atom index:      {int array}
+        """
+    # ref atm, fix/basic atm, mot atm
+        ref1_atm = self._atoms_[ref_indexes[0] ]
+        ref2_atm = self._atoms_[ref_indexes[1] ]
+        ref3_atm = self._atoms_[ref_indexes[2] ]
+        mot_atm  = self._atoms_[mot_indexes[0] ]
+    
+        x1, y1, z1 = ref1_atm.getCoordinate()
+        x2, y2, z2 = ref2_atm.getCoordinate()
+        x3, y3, z3 = ref3_atm.getCoordinate()
+        x4, y4, z4 = mot_atm.getCoordinate()
+    
+        vec1 = Vector(x1 - x2, y1 - y2, z1 - z2)
+        vec2 = Vector(x3 - x2, y3 - y2, z3 - z2)
+        vec3 = Vector(x2 - x3, y2 - y3, z2 - z3)
+        vec4 = Vector(x4 - x3, y4 - y3, z4 - z3)
+    
+        normal_vec1 = vec1.cross(vec2)
+        normal_vec2 = vec3.cross(vec4)
+        normal_vec3 = normal_vec1.cross(normal_vec2)
+    
+        poscars = []
+        tmpIndexes = mot_indexes + grp_indexes
+    
+        for i in xrange(nstep):
+            a = i * angle
+#            tmpPOSCAR = copy.deepcopy(poscar)
+            tmpPOSCAR = POSCAR(comment = self._comment_, select = self._selectiveMode_, coordinate = self._coorndinateType_)
+            tmpPOSCAR._lattice_ = copy.deepcopy(self._lattice_)
+            tmpPOSCAR._atoms_ = copy.deepcopy(self._atoms_)
+    
+            for j in tmpIndexes:
+                tmpX, tmpY, tmpZ = poscar._atoms_[j].getCoordinate()
+                tmpV = Vector(tmpX - x3, tmpY - y3, tmpZ - z3)
+                tmpV = tmpV.rotate(normal_vec3, a)
+                tmpX, tmpY, tmpZ = tmpV.getBasis()
+                tmpPOSCAR.setAtomCoordinate(j, tmpX + x3, tmpY + y3, tmpZ + z3)
+            poscars.append(tmpPOSCAR)
+        return poscars
+
     def addPOSCARcoordindate(atoms):
         pass
+
 
 if __name__ == "__main__":
     import sys
