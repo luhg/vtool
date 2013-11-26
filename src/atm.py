@@ -116,7 +116,8 @@ class Atom:
     """ Atom basic info """
     def __init__(self, element,
                  xCoordinate, yCoordinate, zCoordinate,
-                 xDynamic = 'T', yDynamic = 'T', zDynamic = 'T'):
+                 xDynamic = 'T', yDynamic = 'T', zDynamic = 'T',
+                 xDisplace = 0.0, yDisplace = 0.0, zDisplace = 0.0):
         """ set default argments
             elelment:    atomic element
             xCoordinate: x-axix coordinate
@@ -125,6 +126,9 @@ class Atom:
             xDynamic:    x-axix (T)ranslate/(F)reeze
             yDynamic:    y-axix (T)ranslate/(F)reeze
             zDynamic:    z-axix (T)ranslate/(F)reeze
+            xDisplace:   x-axix displacement
+            yDisplace:   y-axix displacement
+            zDisplace:   z-axix displacement
         """
         self.setElement(element)
         self.setCoordinate(xCoordinate, yCoordinate, zCoordinate)
@@ -151,6 +155,14 @@ class Atom:
 
     def getDynamic(self):
         return (self._xDynamic_, self._yDynamic_, self._zDynamic_)
+
+    def setDispalce(self, xDisplace, yDisplace, zDisplace):
+        self._xDisplace_ = xDisplace
+        self._yDisplace_ = yDisplace
+        self._zDisplace_ = zDisplace
+
+    def getDisplace(self):
+        return (self._xDisplace_, self._yDisplace_, self._zDisplace_)
 
     def __repr__(self):  
         return repr((self._element_, self._xCoordinate_, self._yCoordinate_, self._zCoordinate_) )
