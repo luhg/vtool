@@ -22,3 +22,5 @@ Usage: g2v -i xxx.gjf [-o POSCAR]
   ie.
   g2v -i xxx.gjf
 
+
+vscan.py is a tool to

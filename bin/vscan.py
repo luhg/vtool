@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from vasp import *
+from vtool.vasp import *
 import os, getopt
 import sys
 
