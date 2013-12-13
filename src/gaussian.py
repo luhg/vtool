@@ -145,6 +145,38 @@ class GJF:
 #            self._lattice_ = Lattice(vectors[0], vectors[1], vectors[2])
             self.setLattice(vectors)
 
+
+class Log:
+    """ create/read Gaussian output log """
+    def __init__(self, filename = None):
+        pass
+
+    def setAtom(self):
+        pass
+
+    def setFrequency(self):
+        self._frequencies_ = []
+
+    def readFrequency(self):
+        pass
+
+    def writeFrequency(self):
+        numberOfFrequency = len(self._frequencies_)
+        out1number = '                   %3d'
+        out2number = '                   %3d                    %3d'
+        out3number = '                   %3d                    %3d                    %3d'
+        out1frequency = ' Frequencies --   %10.4f'
+        out2frequency = ' Frequencies --   %10.4f             %10.4f'
+        out3frequency = ' Frequencies --   %10.4f             %10.4f             %10.4f'
+        out1title = ' Atom AN      X      Y      Z'
+        out2title = ' Atom AN      X      Y      Z        X      Y      Z'
+        out3title = ' Atom AN      X      Y      Z        X      Y      Z        X      Y      Z'
+        out1col = ' %3d %3d   %6.2f %6.2f %6.2f'
+        out2col = ' %3d %3d   %6.2f %6.2f %6.2f   %6.2f %6.2f %6.2f'
+        out3col = ' %3d %3d   %6.2f %6.2f %6.2f   %6.2f %6.2f %6.2f   %6.2f %6.2f %6.2f'
+
+    def writeLog(self):
+
 if __name__ == "__main__":
     import sys
     import os
