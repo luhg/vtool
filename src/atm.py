@@ -112,6 +112,69 @@ class Lattice():
         return self._Vectors_
 
 
+class Element:
+    def __init__(self, symbol = 'Z', name = 'Dummy', number = 0, mass = 0.0):
+        """ set default
+            symbol:   chemical symbol {String}  [Z]
+            name:     name of element {String}  [Dummy]
+            number:   atomic number   {Int}     [0]
+            mass:     atomic mass     {Float}   [0.0]
+        """
+        self.setSymbol(symbol)
+        self.setName(name)
+        self.setAtomicNumber(number)
+        self.setAtomicMass(mass)
+
+    def setSymbol(self, s = 'Z'):
+        self._symbol_ = s
+
+    def setName(self, n = 'Dummy'):
+        self._name_ = n
+
+    def setAtomicNumber(self, an = 0):
+        self._atomicNumber_ = an
+
+    def setAtomicMass(self, am = 0.0):
+        self._atomicMass_ = am
+
+    def getSymbol(self):
+        return self._symbol_
+
+    def getName(self):
+        return self._name_
+
+    def getAtomicNumber(self):
+        return self._atomicNumber_
+
+    def getAtomicMass(self):
+        return self._atomicMass_
+
+    def copyElement(self, e):
+        self.setSymbol(e._symbol_)
+        self.setName(e._name_)
+        self.setAtomicNumber(e._atomicNumber_)
+        self.setAtomicMass(e._atomicMass_)
+
+
+PERIODIC_TABLE_ElEMENTS = [Element(),
+                           Element('H',  'Hydrogen', 1, 1.00794),
+                           Element('He', 'Helium',   2, 4.002602),
+                           Element('Li', 'Lithium',  3, 6.941),
+                           ]
+
+
+def checkElementByPeriodicTable(element, method = 'symbol'):
+    if method == 'symbol':
+        for e in PERIODIC_TABLE_ElEMENTS:
+            if e.getSymbol() == element.getSymbol():
+                element.copyElement(e)
+                break
+    elif method == 'name':
+        for e in PERIODIC_TABLE_ElEMENTS:
+            if e.getName() == element.getName():
+                element.copyElement(e)
+                break
+
 class Atom:
     """ Atom basic info """
     def __init__(self, element,
@@ -133,6 +196,7 @@ class Atom:
         self.setElement(element)
         self.setCoordinate(xCoordinate, yCoordinate, zCoordinate)
         self.setDynamic(xDynamic, yDynamic, zDynamic)
+        self.setDispalce(xDisplace, yDisplace, zDisplace)
 
     def setElement(self, element):
         self._element_ = element

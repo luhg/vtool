@@ -376,10 +376,10 @@ class OUTCAR:
                     tmpArray = l.split()
                     # Get image freq
                     if len(tmpArray) == 10:
-                        freq = {"THz": tmpArray[2],
-                                "2PiTHz": tmpArray[4],
-                                "cm-1": tmpArray[6],
-                                "meV": tmpArray[8]}
+                        freq = {"THz": float(tmpArray[2]),
+                                "2PiTHz": float(tmpArray[4]),
+                                "cm-1": float(tmpArray[6]),
+                                "meV": float(tmpArray[8])}
                         atoms = []
                         l = f.readline()
                         tmpArray = l.split()
@@ -400,10 +400,10 @@ class OUTCAR:
 
                     # Get real freq
                     elif len(tmpArray) == 11:
-                        freq = {"THz": tmpArray[3],
-                                "2PiTHz": tmpArray[5],
-                                "cm-1": tmpArray[7],
-                                "meV": tmpArray[9]}
+                        freq = {"THz": float(tmpArray[3]),
+                                "2PiTHz": float(tmpArray[5]),
+                                "cm-1": float(tmpArray[7]),
+                                "meV": float(tmpArray[9])}
                         atoms = []
                         l = f.readline()
                         tmpArray = l.split()
@@ -427,6 +427,38 @@ class OUTCAR:
         f.close()
 #        print totalAtomNumber
         pass
+    def writeOUTCAR(self):
+#        numberOfFrequency = len(self._frequencies_)
+        out1number = '                   %3d'
+        out2number = '                   %3d                    %3d'
+        out3number = '                   %3d                    %3d                         %3d'
+        out1frequency = ' Frequencies --   %10.4f'
+        out2frequency = ' Frequencies --   %10.4f             %10.4f'
+        out3frequency = ' Frequencies --   %10.4f             %10.4f             %10.4f'
+        out1title = ' Atom AN      X      Y      Z'
+        out2title = ' Atom AN      X      Y      Z        X      Y      Z'
+        out3title = ' Atom AN      X      Y      Z        X      Y      Z        X      Y      Z'
+        out1col = ' %3d %3d   %6.2f %6.2f %6.2f'
+        out2col = ' %3d %3d   %6.2f %6.2f %6.2f   %6.2f %6.2f %6.2f'
+        out3col = ' %3d %3d   %6.2f %6.2f %6.2f   %6.2f %6.2f %6.2f   %6.2f %6.2f %6.2f'
+        sentances = [{'number': out3number, 'frequency': out3frequency, 'title': out3title, 'col': out3col},
+                     {'number': out1number, 'frequency': out1frequency, 'title': out1title, 'col': out1col},
+                     {'number': out2number, 'frequency': out2frequency, 'title': out2title, 'col': out2col}]
+
+        numberOfFreq = len(self._dynamicMatrixes_)
+        quotient = numberOfFreq / 3
+        remainder = numberOfFreq % 3
+        print numberOfFreq, quotient, remainder
+        for i in range(quotient):
+            out1 = sentances[0]['number'] %(3*i+1, 3*i+2, 3*i+3)
+            out2 = sentances[0]['frequency'] %(self._dynamicMatrixes_[3*i-3]['freq']['cm-1'], self._dynamicMatrixes_[3*i-2]['freq']['cm-1'], self._dynamicMatrixes_[3*i-1]['freq']['cm-1'])
+            print out1
+            print out2
+             
+#            out2 = sentances[0]['frequency'] %()
+
+#        for d in self._dynamicMatrixes_:
+#            print d['freq']['cm-1']
 
 
 if __name__ == "__main__":
@@ -434,7 +466,7 @@ if __name__ == "__main__":
     import os
 
     o = OUTCAR('OUTCAR')
-
+    o.writeOUTCAR()
 #    p = POSCAR('POSCAR')
 #    p.writePOSCAR()
     pass
