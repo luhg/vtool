@@ -376,10 +376,10 @@ class OUTCAR:
                     tmpArray = l.split()
                     # Get image freq
                     if len(tmpArray) == 10:
-                        freq = {"THz": float(tmpArray[2]),
-                                "2PiTHz": float(tmpArray[4]),
-                                "cm-1": float(tmpArray[6]),
-                                "meV": float(tmpArray[8])}
+                        freq = {"THz": float(tmpArray[2]) * -1.0,
+                                "2PiTHz": float(tmpArray[4]) * 1.0,
+                                "cm-1": float(tmpArray[6]) * -1.0,
+                                "meV": float(tmpArray[8]) * -1.0}
                         atoms = []
                         l = f.readline()
                         tmpArray = l.split()
@@ -448,24 +448,53 @@ class OUTCAR:
         numberOfFreq = len(self._dynamicMatrixes_)
         quotient = numberOfFreq / 3
         remainder = numberOfFreq % 3
+        numberOfAtoms = len(self._dynamicMatrixes_[0]['atoms'])
         print numberOfFreq, quotient, remainder
         for i in range(quotient):
             out1 = sentances[0]['number'] %(3*i+1, 3*i+2, 3*i+3)
             out2 = sentances[0]['frequency'] %(self._dynamicMatrixes_[3*i-3]['freq']['cm-1'], self._dynamicMatrixes_[3*i-2]['freq']['cm-1'], self._dynamicMatrixes_[3*i-1]['freq']['cm-1'])
+            out3 = sentances[0]['title']
             print out1
             print out2
+            print out3
+            for j in range(numberOfAtoms):
+                a11, a12, a13 = self._dynamicMatrixes_[3*i-3]['atoms'][j].getDisplace()
+                a21, a22, a23 = self._dynamicMatrixes_[3*i-2]['atoms'][j].getDisplace()
+                a31, a32, a33 = self._dynamicMatrixes_[3*i-1]['atoms'][j].getDisplace()
+                out4 = sentances[0]['col'] %(j+1, 1, a11, a12, a13, a21, a22, a23, a31, a32, a33)
+                print out4
+
+        if remainder == 1:
+            out1 = sentances[1]['number'] %(numberOfFreq)
+            out2 = sentances[1]['frequency'] %(self._dynamicMatrixes_[numberOfFreq-1]['freq']['cm-1'])
+            out3 = sentances[1]['title']
+            print out1
+            print out2
+            print out3
+            for j in range(numberOfAtoms):
+                a11, a12, a13 = self._dynamicMatrixes_[numberOfFreq-1]['atoms'][j].getDisplace()
+                out4 = sentances[1]['col'] %(j+1, 1, a11, a12, a13)
+                print out4
+        elif remainder == 2:
+            out1 = sentances[2]['number'] %(numberOfFreq-1, numberOfFreq)
+            out2 = sentances[2]['frequency'] %(self._dynamicMatrixes_[numberOfFreq-2]['freq']['cm-1'], self._dynamicMatrixes_[numberOfFreq-2]['freq']['cm-1'])
+            out3 = sentances[2]['title']
+            print out1
+            print out2
+            print out3
+            for j in range(numberOfAtoms):
+                a11, a12, a13 = self._dynamicMatrixes_[numberOfFreq-2]['atoms'][j].getDisplace()
+                a21, a22, a23 = self._dynamicMatrixes_[numberOfFreq-1]['atoms'][j].getDisplace()
+                out4 = sentances[2]['col'] %(j+1, 1, a11, a12, a13, a21, a22, a23)
+                print out4
              
-#            out2 = sentances[0]['frequency'] %()
-
-#        for d in self._dynamicMatrixes_:
-#            print d['freq']['cm-1']
-
 
 if __name__ == "__main__":
     import sys
     import os
 
-    o = OUTCAR('OUTCAR')
+#    o = OUTCAR('OUTCAR')
+    o = OUTCAR('O2')
     o.writeOUTCAR()
 #    p = POSCAR('POSCAR')
 #    p.writePOSCAR()
