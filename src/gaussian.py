@@ -176,6 +176,7 @@ class Log:
         out3col = ' %3d %3d   %6.2f %6.2f %6.2f   %6.2f %6.2f %6.2f   %6.2f %6.2f %6.2f'
 
     def writeLog(self):
+        pass
 
 if __name__ == "__main__":
     import sys
