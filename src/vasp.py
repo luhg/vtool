@@ -449,7 +449,11 @@ class OUTCAR:
         quotient = numberOfFreq / 3
         remainder = numberOfFreq % 3
         numberOfAtoms = len(self._dynamicMatrixes_[0]['atoms'])
-        print numberOfFreq, quotient, remainder
+#        print numberOfFreq, quotient, remainder
+        print """ Harmonic frequencies (cm**-1), IR intensities (KM/Mole), Raman scattering
+ activities (A**4/AMU), depolarization ratios for plane and unpolarized
+ incident light, reduced masses (AMU), force constants (mDyne/A),
+ and normal coordinates:"""
         for i in range(quotient):
             out1 = sentances[0]['number'] %(3*i+1, 3*i+2, 3*i+3)
             out2 = sentances[0]['frequency'] %(self._dynamicMatrixes_[3*i-3]['freq']['cm-1'], self._dynamicMatrixes_[3*i-2]['freq']['cm-1'], self._dynamicMatrixes_[3*i-1]['freq']['cm-1'])
