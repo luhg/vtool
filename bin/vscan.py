@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from vtool.vasp import *
+from vtool.util import *
 import os, getopt
 import sys
 
@@ -12,11 +12,26 @@ __version__ = "$Revision: 0.1$"
 
 def makeScanJob(poscars):
     i = 0
+    g = GJF()
     for p in poscars:
         dir = "0%d" %(i) if i < 10 else "%2d" %(i)
-        os.mkdir(dir)
-        print os.path.join(dir, 'POSCAR')
-        p.writePOSCAR(os.path.join(dir, 'POSCAR'))
+        if os.path.isdir(dir):
+            pass
+        else:
+            os.mkdir(dir)
+
+        if os.path.isfile(os.path.join(dir, 'POSCAR') ):
+#            print "Overwrite POSCAR[Y/n] :"
+            overwriteFlag = raw_input("Overwrite %s/POSCAR[Y/n] : " %dir)
+            if overwriteFlag.lower() == 'y':
+                p.writePOSCAR(os.path.join(dir, 'POSCAR') )
+                poscar2gjf(p, g)
+                g.writeGJF(os.path.join(dir, dir + ".gjf") )
+
+        else:
+            p.writePOSCAR(os.path.join(dir, 'POSCAR') )
+            poscar2gjf(p, g)
+            g.writeGJF(os.path.join(dir, dir + ".gjf") )
         i = i + 1
     pass
 
