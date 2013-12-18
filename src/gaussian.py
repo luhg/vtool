@@ -50,7 +50,8 @@ class GJF:
 
     def sortAtoms(self):
 #        self._atoms_ = sorted(self._atoms_, key=lambda atom: atom._element_)
-        self._atoms_ = sorted(self._atoms_, key=lambda atom: (atom._element_, atom._zCoordinate_) )
+#        self._atoms_ = sorted(self._atoms_, key=lambda atom: (atom._element_, atom._zCoordinate_) )
+        self._atoms_ = sorted(self._atoms_, key=lambda atom: (atom._symbol_, atom._zCoordinate_) )
 
     def getOption(self):
         return self._option_
@@ -106,7 +107,8 @@ class GJF:
         output += self._comment_ + "\n\n"
         output += '%i %i\n' %(self._charge_, self._spin_)
         for a in self._atoms_:
-            output += "%-2s" % a.getElement() + "       %13.8f    %13.8f    %13.8f\n" % a.getCoordinate()
+#            output += "%-2s" % a.getElement() + "       %13.8f    %13.8f    %13.8f\n" % a.getCoordinate()
+            output += "%-2s" % a.getSymbol() + "       %13.8f    %13.8f    %13.8f\n" % a.getCoordinate()
 
         if isinstance(self._lattice_, Lattice):
             for v in self._lattice_.getVectors():
@@ -129,7 +131,8 @@ class GJF:
         lattice_indexes = []
         vectors = []
         for atom in self._atoms_:
-            if atom.getElement() == "Tv":
+#            if atom.getElement() == "Tv":
+            if atom.getSymbol() == "Tv":
 ##                (x, y, z) = atom.getCoordinate()
 ##                vectors.append([x, y, z])
 #                vectors.append(atom.getCoordinate() )

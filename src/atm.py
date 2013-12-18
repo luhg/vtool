@@ -156,6 +156,103 @@ class Element:
         self.setAtomicMass(e._atomicMass_)
 
 
+class Atom(Element):
+    """ Atom basic info """
+    def __init__(self, elementSymbol = 'Z',
+                 xCoordinate = 0.0, yCoordinate = 0.0, zCoordinate = 0.0,
+                 xDynamic = 'T', yDynamic = 'T', zDynamic = 'T',
+                 xDisplace = 0.0, yDisplace = 0.0, zDisplace = 0.0):
+        """ set default argments
+            elelment:    atomic element
+            xCoordinate: x-axix coordinate
+            yCoordinate: y-axix coordinate
+            zCoordinate: z-axix coordinate
+            xDynamic:    x-axix (T)ranslate/(F)reeze
+            yDynamic:    y-axix (T)ranslate/(F)reeze
+            zDynamic:    z-axix (T)ranslate/(F)reeze
+            xDisplace:   x-axix displacement
+            yDisplace:   y-axix displacement
+            zDisplace:   z-axix displacement
+        """
+#        self.setElement(element)
+        self.setSymbol(elementSymbol)
+        self.setCoordinate(xCoordinate, yCoordinate, zCoordinate)
+        self.setDynamic(xDynamic, yDynamic, zDynamic)
+        self.setDispalce(xDisplace, yDisplace, zDisplace)
+
+#    def setElement(self, element):
+#        self._element_ = element
+
+#    def getElement(self):
+#        return self._element_
+
+    def setCoordinate(self, xCoordinate, yCoordinate, zCoordinate):
+        self._xCoordinate_ = xCoordinate
+        self._yCoordinate_ = yCoordinate
+        self._zCoordinate_ = zCoordinate
+
+    def getCoordinate(self):
+        return (self._xCoordinate_, self._yCoordinate_, self._zCoordinate_)
+
+    def setDynamic(self, xDynamic, yDynamic, zDynamic):
+        self._xDynamic_ = xDynamic
+        self._yDynamic_ = yDynamic
+        self._zDynamic_ = zDynamic
+
+    def getDynamic(self):
+        return (self._xDynamic_, self._yDynamic_, self._zDynamic_)
+
+    def setDispalce(self, xDisplace, yDisplace, zDisplace):
+        self._xDisplace_ = xDisplace
+        self._yDisplace_ = yDisplace
+        self._zDisplace_ = zDisplace
+
+    def getDisplace(self):
+        return (self._xDisplace_, self._yDisplace_, self._zDisplace_)
+
+    def __repr__(self):  
+        return repr((self._element_, self._xCoordinate_, self._yCoordinate_, self._zCoordinate_) )
+
+    def showAtom(self):
+        print "%3s, %+14.10f, %+14.10f, %+14.10f, %4s, %4s, %4s" %(self._element_, self._xCoordinate_, self._yCoordinate_, self._zCoordinate_, self._xDynamic_, self._yDynamic_, self._zDynamic_)
+
+    def copyAtom(self, atom):
+#        self.copyElement(atom)
+        self.setSymbol(atom._symbol_)
+        self.setCoordinate(atom._xCoordinate_, atom._yCoordinate_, atom._zCoordinate_)
+        self.setDynamic(atom._xDynamic_, atom._yDynamic_, atom._zDynamic_)
+        self.setDispalce(atom._xDisplace_, atom._yDisplace_, atom._zDisplace_)
+#        self.set
+        pass
+
+    def addCoordinate(self, x, y, z):
+        X = self._xCoordinate_ + x
+        Y = self._yCoordinate_ + y
+        Z = self._zCoordinate_ + z
+        return Atom(self._element_, X, Y, Z, self._xDynamic_, self._yDynamic_, self._zDynamic_)
+
+    def subCoordinate(self, x, y, z):
+        X = self._xCoordinate_ - x
+        Y = self._yCoordinate_ - y
+        Z = self._zCoordinate_ - z
+        return Atom(self._element_, X, Y, Z, self._xDynamic_, self._yDynamic_, self._zDynamic_)
+
+    def mulCoordinate(self, f):
+        X = self._xCoordinate_ * f
+        Y = self._yCoordinate_ * f
+        Z = self._zCoordinate_ * f
+        return Atom(self._element_, X, Y, Z, self._xDynamic_, self._yDynamic_, self._zDynamic_)
+
+    def divCoordinate(self, f):
+        X = self._xCoordinate_ / f
+        Y = self._yCoordinate_ / f
+        Z = self._zCoordinate_ / f
+        return Atom(self._element_, X, Y, Z, self._xDynamic_, self._yDynamic_, self._zDynamic_)
+
+
+""" default periodic table element:
+    global constant: PERIODIC_TABLE_ElEMENTS
+"""
 PERIODIC_TABLE_ElEMENTS = [Element(),
                            Element('H',   'Hydrogen',      1,   1.00794),
                            Element('He',  'Helium',        2,   4.002602),
@@ -278,6 +375,8 @@ PERIODIC_TABLE_ElEMENTS = [Element(),
                           ]
 
 def checkElementByPeriodicTable(element, method = 'symbol'):
+    """ setup element all properties in peridic table
+    """
     if method == 'symbol':
         for e in PERIODIC_TABLE_ElEMENTS:
             if e.getSymbol() == element.getSymbol():
@@ -289,96 +388,6 @@ def checkElementByPeriodicTable(element, method = 'symbol'):
                 element.copyElement(e)
                 break
 
-class Atom:
-    """ Atom basic info """
-    def __init__(self, element,
-                 xCoordinate, yCoordinate, zCoordinate,
-                 xDynamic = 'T', yDynamic = 'T', zDynamic = 'T',
-                 xDisplace = 0.0, yDisplace = 0.0, zDisplace = 0.0):
-        """ set default argments
-            elelment:    atomic element
-            xCoordinate: x-axix coordinate
-            yCoordinate: y-axix coordinate
-            zCoordinate: z-axix coordinate
-            xDynamic:    x-axix (T)ranslate/(F)reeze
-            yDynamic:    y-axix (T)ranslate/(F)reeze
-            zDynamic:    z-axix (T)ranslate/(F)reeze
-            xDisplace:   x-axix displacement
-            yDisplace:   y-axix displacement
-            zDisplace:   z-axix displacement
-        """
-        self.setElement(element)
-        self.setCoordinate(xCoordinate, yCoordinate, zCoordinate)
-        self.setDynamic(xDynamic, yDynamic, zDynamic)
-        self.setDispalce(xDisplace, yDisplace, zDisplace)
-
-    def setElement(self, element):
-        self._element_ = element
-
-    def getElement(self):
-        return self._element_
-
-    def setCoordinate(self, xCoordinate, yCoordinate, zCoordinate):
-        self._xCoordinate_ = xCoordinate
-        self._yCoordinate_ = yCoordinate
-        self._zCoordinate_ = zCoordinate
-
-    def getCoordinate(self):
-        return (self._xCoordinate_, self._yCoordinate_, self._zCoordinate_)
-
-    def setDynamic(self, xDynamic, yDynamic, zDynamic):
-        self._xDynamic_ = xDynamic
-        self._yDynamic_ = yDynamic
-        self._zDynamic_ = zDynamic
-
-    def getDynamic(self):
-        return (self._xDynamic_, self._yDynamic_, self._zDynamic_)
-
-    def setDispalce(self, xDisplace, yDisplace, zDisplace):
-        self._xDisplace_ = xDisplace
-        self._yDisplace_ = yDisplace
-        self._zDisplace_ = zDisplace
-
-    def getDisplace(self):
-        return (self._xDisplace_, self._yDisplace_, self._zDisplace_)
-
-    def __repr__(self):  
-        return repr((self._element_, self._xCoordinate_, self._yCoordinate_, self._zCoordinate_) )
-
-    def showAtom(self):
-        print "%3s, %+14.10f, %+14.10f, %+14.10f, %4s, %4s, %4s" %(self._element_, self._xCoordinate_, self._yCoordinate_, self._zCoordinate_, self._xDynamic_, self._yDynamic_, self._zDynamic_)
-
-    def addCoordinate(self, x, y, z):
-        X = self._xCoordinate_ + x
-        Y = self._yCoordinate_ + y
-        Z = self._zCoordinate_ + z
-        return Atom(self._element_, X, Y, Z, self._xDynamic_, self._yDynamic_, self._zDynamic_)
-
-    def subCoordinate(self, x, y, z):
-        X = self._xCoordinate_ - x
-        Y = self._yCoordinate_ - y
-        Z = self._zCoordinate_ - z
-        return Atom(self._element_, X, Y, Z, self._xDynamic_, self._yDynamic_, self._zDynamic_)
-
-    def mulCoordinate(self, f):
-        X = self._xCoordinate_ * f
-        Y = self._yCoordinate_ * f
-        Z = self._zCoordinate_ * f
-        return Atom(self._element_, X, Y, Z, self._xDynamic_, self._yDynamic_, self._zDynamic_)
-
-    def divCoordinate(self, f):
-        X = self._xCoordinate_ / f
-        Y = self._yCoordinate_ / f
-        Z = self._zCoordinate_ / f
-        return Atom(self._element_, X, Y, Z, self._xDynamic_, self._yDynamic_, self._zDynamic_)
-
-#    def __add__(self, atom):
-#        x, y, z = atom.getCoordinate()
-#        X = self._xCoordinate_ + x
-#        Y = self._yCoordinate_ + y
-#        Z = self._zCoordinate_ + z
-#        newAtom = Atom(self._element_, X, Y, Z, self._xDynamic_, self._yDynamic_, self._zDynamic_)
-#        return newAtom
 
 
 if __name__ == "__main__":

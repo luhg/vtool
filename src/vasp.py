@@ -47,14 +47,20 @@ class POSCAR:
         return self._lattice_
 
     def addAtom(self, atom):
-        a = Atom(atom._element_, atom._xCoordinate_, atom._yCoordinate_, atom._zCoordinate_, atom._xDynamic_, atom._yDynamic_, atom._zDynamic_)
+#        a = Atom(atom._symbol_,
+#                 atom._xCoordinate_, atom._yCoordinate_, atom._zCoordinate_,
+#                 atom._xDynamic_,    atom._yDynamic_,    atom._zDynamic_,
+#                 atom._xDisplace_,   atom._yDisplace_,   atom._zDisplace_)
+        a = Atom()
+        a.copyAtom(atom)
         self._atoms_.append(a)
 
     def delAtom(self):
         pass
 
-    def setAtomElement(self, index, element):
-        self._atoms_[index].setElement(element)
+    def setAtomElement(self, index, elementSymbol):
+#        self._atoms_[index].setElement(element)
+        self._atoms_[index].setSymbol(elementSymbol)
 
     def setAtomCoordinate(self, index, xCoordinate, yCoordinate, zCoordinate):
         self._atoms_[index].setCoordinate(xCoordinate, yCoordinate, zCoordinate)
@@ -70,11 +76,13 @@ class POSCAR:
             a.showAtom()
     
     def _checkElements_(self):
-        tmpElementType = self._atoms_[0].getElement()
+#        tmpElementType = self._atoms_[0].getElement()
+        tmpElementType = self._atoms_[0].getSymbol()
         tmpElementNumber = 0
         elements = []
         for a in self._atoms_:
-            e = a.getElement()
+#            e = a.getElement()
+            e = a.getSymbol()
             if tmpElementType == e:
                 tmpElementNumber += 1
             else:
@@ -90,7 +98,8 @@ class POSCAR:
         n = 0
         for i in range(len(es) ):
             for j in range(es[i].values()[0] ):
-                self._atoms_[n].setElement(elements[i])
+#                self._atoms_[n].setElement(elements[i])
+                self._atoms_[n].setSymbol(elements[i])
                 n += 1
 
     def setSelectiveMode(self, mode):
@@ -150,9 +159,9 @@ class POSCAR:
             for j in range(tmpAtomNumbers[i]):
                 l = f.readline().split()
                 if len(l) == 3:
-                    a = Atom(str(i) ,float(l[0]) ,float(l[1]))
+                    a = Atom(str(i) ,float(l[0]) ,float(l[1]), float(l[2]) )
                 elif len(l) == 6:
-                    a = Atom(str(i) ,float(l[0]) ,float(l[1]) ,float(l[2]), l[3], l[4], l[5])
+                    a = Atom(str(i) ,float(l[0]) ,float(l[1]), float(l[2]), l[3], l[4], l[5])
                 else:
                     print "error format"
                 self.addAtom(a)
