@@ -429,18 +429,19 @@ class OUTCAR:
         pass
     def writeOUTCAR(self):
 #        numberOfFrequency = len(self._frequencies_)
-        out1number = '                   %3d'
-        out2number = '                   %3d                    %3d'
-        out3number = '                   %3d                    %3d                         %3d'
-        out1frequency = ' Frequencies --   %10.4f'
-        out2frequency = ' Frequencies --   %10.4f             %10.4f'
-        out3frequency = ' Frequencies --   %10.4f             %10.4f             %10.4f'
-        out1title = ' Atom AN      X      Y      Z'
-        out2title = ' Atom AN      X      Y      Z        X      Y      Z'
-        out3title = ' Atom AN      X      Y      Z        X      Y      Z        X      Y      Z'
-        out1col = ' %3d %3d   %6.2f %6.2f %6.2f'
-        out2col = ' %3d %3d   %6.2f %6.2f %6.2f   %6.2f %6.2f %6.2f'
-        out3col = ' %3d %3d   %6.2f %6.2f %6.2f   %6.2f %6.2f %6.2f   %6.2f %6.2f %6.2f'
+        outatom = '     %3d       %3d        %3d       %10.6f   %10.6f %10.6f\n'
+        out1number = '                   %3d\n'
+        out2number = '                   %3d                    %3d\n'
+        out3number = '                   %3d                    %3d                         %3d\n'
+        out1frequency = ' Frequencies --   %10.4f\n'
+        out2frequency = ' Frequencies --   %10.4f             %10.4f\n'
+        out3frequency = ' Frequencies --   %10.4f             %10.4f             %10.4f\n'
+        out1title = ' Atom AN      X      Y      Z\n'
+        out2title = ' Atom AN      X      Y      Z        X      Y      Z\n'
+        out3title = ' Atom AN      X      Y      Z        X      Y      Z        X      Y      Z\n'
+        out1col = ' %3d %3d   %6.2f %6.2f %6.2f\n'
+        out2col = ' %3d %3d   %6.2f %6.2f %6.2f   %6.2f %6.2f %6.2f\n'
+        out3col = ' %3d %3d   %6.2f %6.2f %6.2f   %6.2f %6.2f %6.2f   %6.2f %6.2f %6.2f\n'
         sentances = [{'number': out3number, 'frequency': out3frequency, 'title': out3title, 'col': out3col},
                      {'number': out1number, 'frequency': out1frequency, 'title': out1title, 'col': out1col},
                      {'number': out2number, 'frequency': out2frequency, 'title': out2title, 'col': out2col}]
@@ -450,47 +451,66 @@ class OUTCAR:
         remainder = numberOfFreq % 3
         numberOfAtoms = len(self._dynamicMatrixes_[0]['atoms'])
 #        print numberOfFreq, quotient, remainder
-        print """ Harmonic frequencies (cm**-1), IR intensities (KM/Mole), Raman scattering
+        out = """                         Standard orientation:
+ ---------------------------------------------------------------------
+ Center     Atomic     Atomic              Coordinates (Angstroms)
+ Number     Number      Type              X           Y           Z
+ ---------------------------------------------------------------------\n"""
+
+        for i in range(numberOfAtoms):
+            x, y, z = self._dynamicMatrixes_[0]['atoms'][i].getCoordinate()
+            out0 = outatom %(i+1, 1, 0, x, y, z)
+            out = out + out0
+        out = out + '---------------------------------------------------------------------\n'
+ 
+        out = out +  """ Harmonic frequencies (cm**-1), IR intensities (KM/Mole), Raman scattering
  activities (A**4/AMU), depolarization ratios for plane and unpolarized
  incident light, reduced masses (AMU), force constants (mDyne/A),
- and normal coordinates:"""
+ and normal coordinates:\n"""
         for i in range(quotient):
             out1 = sentances[0]['number'] %(3*i+1, 3*i+2, 3*i+3)
             out2 = sentances[0]['frequency'] %(self._dynamicMatrixes_[3*i-3]['freq']['cm-1'], self._dynamicMatrixes_[3*i-2]['freq']['cm-1'], self._dynamicMatrixes_[3*i-1]['freq']['cm-1'])
             out3 = sentances[0]['title']
-            print out1
-            print out2
-            print out3
+            out = out + out1 + out2 + out3
+#            print out1
+#            print out2
+#            print out3
             for j in range(numberOfAtoms):
                 a11, a12, a13 = self._dynamicMatrixes_[3*i-3]['atoms'][j].getDisplace()
                 a21, a22, a23 = self._dynamicMatrixes_[3*i-2]['atoms'][j].getDisplace()
                 a31, a32, a33 = self._dynamicMatrixes_[3*i-1]['atoms'][j].getDisplace()
                 out4 = sentances[0]['col'] %(j+1, 1, a11, a12, a13, a21, a22, a23, a31, a32, a33)
-                print out4
+                out = out + out4
+#                print out4
 
         if remainder == 1:
             out1 = sentances[1]['number'] %(numberOfFreq)
             out2 = sentances[1]['frequency'] %(self._dynamicMatrixes_[numberOfFreq-1]['freq']['cm-1'])
             out3 = sentances[1]['title']
-            print out1
-            print out2
-            print out3
+            out = out + out1 + out2 + out3
+#            print out1
+#            print out2
+#            print out3
             for j in range(numberOfAtoms):
                 a11, a12, a13 = self._dynamicMatrixes_[numberOfFreq-1]['atoms'][j].getDisplace()
                 out4 = sentances[1]['col'] %(j+1, 1, a11, a12, a13)
-                print out4
+                out = out + out4
+#                print out4
         elif remainder == 2:
             out1 = sentances[2]['number'] %(numberOfFreq-1, numberOfFreq)
             out2 = sentances[2]['frequency'] %(self._dynamicMatrixes_[numberOfFreq-2]['freq']['cm-1'], self._dynamicMatrixes_[numberOfFreq-2]['freq']['cm-1'])
             out3 = sentances[2]['title']
-            print out1
-            print out2
-            print out3
+            out = out + out1 + out2 + out3
+#            print out1
+#            print out2
+#            print out3
             for j in range(numberOfAtoms):
                 a11, a12, a13 = self._dynamicMatrixes_[numberOfFreq-2]['atoms'][j].getDisplace()
                 a21, a22, a23 = self._dynamicMatrixes_[numberOfFreq-1]['atoms'][j].getDisplace()
                 out4 = sentances[2]['col'] %(j+1, 1, a11, a12, a13, a21, a22, a23)
-                print out4
+#                print out4
+                out = out + out4
+        print out
              
 
 if __name__ == "__main__":
