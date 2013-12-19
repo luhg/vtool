@@ -78,20 +78,27 @@ class GJF:
         """ read Gaussian input file """
         f = open(filename, "r")
         i = 0
+        optFlag = -5
         for l in f.readlines():
+            print "i: %d, optFlag: %d" %(i, optFlag)
             if l[0] == "%":
                 self._specs_.append(l.rstrip() )
-                continue
+#                continue
             elif l[0] == "#":
 #                self._option_ = l.rstrip()
                 self.setOption(l.rstrip() )
-                continue 
+                optFlag = i
+#                continue 
             elif l.strip() == "":
-                continue
+                 pass
+#                continue
+            elif optFlag + 2 == i:
+                 self.setComment(l.rstrip() )
             elif len(l.split()) == 4:
                  atom = Atom(l.split()[0], float(l.split()[1]), float(l.split()[2]), float(l.split()[3]) )
                  checkElementByPeriodicTable(atom, 'symbol')
                  self.addAtom(atom)
+            i += 1
         self.sortAtoms()
         self._checkLattice_()
 #        self.sortAtoms()

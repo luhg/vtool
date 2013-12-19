@@ -173,13 +173,9 @@ class POSCAR:
                 l = f.readline().split()
                 if len(l) == 3:
                     a = Atom(symbol ,float(l[0]) ,float(l[1]), float(l[2]) )
-#                    a = Atom(str(i) ,float(l[0]) ,float(l[1]), float(l[2]) )
-#                    a = Atom('X' ,float(l[0]) ,float(l[1]), float(l[2]) )
                     checkElementByPeriodicTable(a, 'symbol')
                 elif len(l) == 6:
                     a = Atom(symbol ,float(l[0]) ,float(l[1]), float(l[2]), l[3], l[4], l[5])
-#                    a = Atom(str(i) ,float(l[0]) ,float(l[1]), float(l[2]), l[3], l[4], l[5])
-#                    a = Atom('X' ,float(l[0]) ,float(l[1]), float(l[2]), l[3], l[4], l[5])
                     checkElementByPeriodicTable(a, 'symbol')
                 else:
                     print "error format"
@@ -354,8 +350,20 @@ class POSCAR:
             poscars.append(tmpPOSCAR)
         return poscars
 
-    def addPOSCARcoordindate(atoms):
+    def addPOSCARcoordindate(self, atoms):
         pass
+
+#    def directTOcartesian(self):
+#        l = self._lattice_.getVectors()
+#        v11, v12, v13 = l[0].getBasis()
+#        v21, v22, v23 = l[1].getBasis()
+#        v31, v32, v33 = l[2].getBasis()
+#        for a in self._atoms_:
+#        self._xCoordinate_ = * (v10 + v12 + v13) 
+#        self._yCoordinate_ = yCoordinate * (v21 + v22 + v23)
+#        self._zCoordinate_ = zCoordinate * (v31 + v32 + v33)
+
+
 
 class OUTCAR:
     def __init__(self, filename = 'OUTCAR'):
