@@ -118,22 +118,30 @@ class POSCAR:
         f = open(filename)
         self.setComment(f.readline().rstrip())
         # setup lattice constant
-        latticeConstant = float(f.readline().rstrip()[0])
+        latticeConstant = float(f.readline().split()[0])
         vectors = []
 
         # setup lattice vector
         for i in range(3):
-            l = f.readline().rstrip()
-            tmpVec = Vector(float(l.split()[0]), float(l.split()[1]), float(l.split()[2]) )
+#            l = f.readline().rstrip()
+            l = f.readline().split()
+            tmpVec = Vector(float(l[0]), float(l[1]), float(l[2]) )
             vectors.append(tmpVec)
 #            vectors.append((float(l.split()[0]), float(l.split()[1]), float(l.split()[2]) ) )
         self.setLattice(vectors, latticeConstant)
 
         # setup number of element type
-        l = f.readline()
+        tmpAtomTypes = []
         tmpAtomNumbers = []
+        l = f.readline().split()
+
+        # for VASP5 POSCAR
+        if l[0].isalpha():
+            tmpAtomTypes = l
+            l = f.readline().split()
+
         totalAtomNumber = 0
-        for n in l.split():
+        for n in l:
             tmpAtomNumbers.append(int(n) )
 
         # setup selective mode and coordinate type
@@ -156,14 +164,21 @@ class POSCAR:
 
         # setup atom coordinate
         for i in range(len(tmpAtomNumbers) ):
+            if len(tmpAtomTypes) is not 0:
+                symbol = tmpAtomTypes[i]
+            else:
+                symbol = str(i)
+                pass
             for j in range(tmpAtomNumbers[i]):
                 l = f.readline().split()
                 if len(l) == 3:
-                    a = Atom(str(i) ,float(l[0]) ,float(l[1]), float(l[2]) )
+                    a = Atom(symbol ,float(l[0]) ,float(l[1]), float(l[2]) )
+#                    a = Atom(str(i) ,float(l[0]) ,float(l[1]), float(l[2]) )
 #                    a = Atom('X' ,float(l[0]) ,float(l[1]), float(l[2]) )
                     checkElementByPeriodicTable(a, 'symbol')
                 elif len(l) == 6:
-                    a = Atom(str(i) ,float(l[0]) ,float(l[1]), float(l[2]), l[3], l[4], l[5])
+                    a = Atom(symbol ,float(l[0]) ,float(l[1]), float(l[2]), l[3], l[4], l[5])
+#                    a = Atom(str(i) ,float(l[0]) ,float(l[1]), float(l[2]), l[3], l[4], l[5])
 #                    a = Atom('X' ,float(l[0]) ,float(l[1]), float(l[2]), l[3], l[4], l[5])
                     checkElementByPeriodicTable(a, 'symbol')
                 else:
@@ -523,6 +538,8 @@ if __name__ == "__main__":
 #    o = OUTCAR('OUTCAR')
 #    o.writeLog()
 
-#    p = POSCAR('POSCAR')
-#    p.writePOSCAR()
+#    p = POSCAR('POSCAR5C')
+    p = POSCAR('CONTCAR5')
+#    p = POSCAR('POSCAR4')
+    p.writePOSCAR()
     pass
