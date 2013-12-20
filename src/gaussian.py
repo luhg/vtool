@@ -80,7 +80,6 @@ class GJF:
         i = 0
         optFlag = -5
         for l in f.readlines():
-            print "i: %d, optFlag: %d" %(i, optFlag)
             if l[0] == "%":
                 self._specs_.append(l.rstrip() )
 #                continue
@@ -112,7 +111,6 @@ class GJF:
         output += self._comment_ + "\n\n"
         output += '%i %i\n' %(self._charge_, self._spin_)
         for a in self._atoms_:
-#            output += "%-2s" % a.getElement() + "       %13.8f    %13.8f    %13.8f\n" % a.getCoordinate()
             output += "%-2s" % a.getSymbol() + "       %13.8f    %13.8f    %13.8f\n" % a.getCoordinate()
 
         if isinstance(self._lattice_, Lattice):

@@ -353,25 +353,80 @@ class POSCAR:
     def addPOSCARcoordindate(self, atoms):
         pass
 
-#    def directTOcartesian(self):
-#        l = self._lattice_.getVectors()
-#        v11, v12, v13 = l[0].getBasis()
-#        v21, v22, v23 = l[1].getBasis()
-#        v31, v32, v33 = l[2].getBasis()
-#        for a in self._atoms_:
-#        self._xCoordinate_ = * (v10 + v12 + v13) 
-#        self._yCoordinate_ = yCoordinate * (v21 + v22 + v23)
-#        self._zCoordinate_ = zCoordinate * (v31 + v32 + v33)
+    def directToCartesian(self):
+        """ direct coordinate convert to cartesian coordinate
+            ref: http://en.wikipedia.org/wiki/Fractional_coordinates#Conversion_to_cartesian_coordinates
+        """
+        if self.getCoorndinateType()[0].upper() == 'D':
+            self.setCoorndinateType('Cartesian')
+            l = self.getLattice().getVectors()
+            lc = self.getLattice().getConstant()
+            v1 = l[0]
+            v2 = l[1]
+            v3 = l[2]
+            alpha = v2.getAngle(v3)
+            beta  = v1.getAngle(v2)
+            gamma = v1.getAngle(v3)
+            v1Len = v1.getLength()
+            v2Len = v2.getLength()
+            v3Len = v3.getLength()
+            cosAlpha = math.cos(math.radians(alpha) )
+            cosBeta  = math.cos(math.radians(beta) )
+            cosGamma = math.cos(math.radians(gamma) )
+            sinAlpha = math.sin(math.radians(alpha) )
+            sinBeta  = math.sin(math.radians(beta) )
+            sinGamma = math.sin(math.radians(gamma) )
+            volume = math.sqrt(1 - cosAlpha*cosAlpha - cosBeta*cosBeta - cosGamma*cosGamma + 2*cosAlpha*cosBeta*cosGamma)
 
+            for a in self._atoms_:
+                x, y, z = a.getCoordinate()
+                tmpX = v1Len*x + v2Len*cosGamma*y + v3Len*cosBeta*z
+                tmpY = v2Len*sinGamma*y + v3Len*(cosAlpha - cosBeta*cosGamma)/sinGamma*z
+                tmpZ = v3Len*volume/sinGamma*z
+                a.setCoordinate(tmpX, tmpY, tmpZ)
+
+    def cartesianToDirect(self):
+        """ cartesian coordinate convert to direct coordinate
+            ref: http://en.wikipedia.org/wiki/Fractional_coordinates#Conversion_from_cartesian_coordinates
+        """
+        if self.getCoorndinateType()[0].upper() == 'C':
+            self.setCoorndinateType('Direct')
+            l = self.getLattice().getVectors()
+            lc = self.getLattice().getConstant()
+            v1 = l[0]
+            v2 = l[1]
+            v3 = l[2]
+            alpha = v2.getAngle(v3)
+            beta  = v1.getAngle(v2)
+            gamma = v1.getAngle(v3)
+            v1Len = v1.getLength()
+            v2Len = v2.getLength()
+            v3Len = v3.getLength()
+            cosAlpha = math.cos(math.radians(alpha) )
+            cosBeta  = math.cos(math.radians(beta) )
+            cosGamma = math.cos(math.radians(gamma) )
+            sinAlpha = math.sin(math.radians(alpha) )
+            sinBeta  = math.sin(math.radians(beta) )
+            sinGamma = math.sin(math.radians(gamma) )
+            volume = math.sqrt(1 - cosAlpha*cosAlpha - cosBeta*cosBeta - cosGamma*cosGamma + 2*cosAlpha*cosBeta*cosGamma)
+
+            for a in self._atoms_:
+                x, y, z = a.getCoordinate()
+                tmpX = 1/v1Len*x - cosGamma/v1Len/sinGamma*y + (cosAlpha*cosGamma - cosBeta)/v1Len/volume/sinGamma*z
+                tmpY = 1/v2Len*y + (cosBeta*cosGamma - cosAlpha)/v2Len/volume/sinGamma*z
+                tmpZ = sinGamma/v3Len/volume*z
+#                a.setCoordinate(tmpX/lc, tmpY/lc, tmpZ/lc)
+                a.setCoordinate(tmpX, tmpY, tmpZ)
+            
 
 
 class OUTCAR:
     def __init__(self, filename = 'OUTCAR'):
         self._elements_ = []
         self._dynamicMatrixes_ = []
-        self.readOUTCAT(filename)
+        self.readOUTCAR(filename)
 
-    def readOUTCAT(self, filename):
+    def readOUTCAR(self, filename):
         f = open(filename)
         l = ' '
         reSpace = re.compile('^\s+?$')
@@ -539,6 +594,29 @@ class OUTCAR:
             f.close()
 #    
 
+def determinant33(a, b, c, d, e, f, g, h, i):
+    """ |a b c|
+        |d e f|
+        |g h i|
+    """
+    return a*(e*i - f*h) - d*(b*i - c*h) + g*(b*f - c*e)
+
+def linearEq3unkowns(a1, a2, a3, b1, b2, b3, c1, c2, c3, d1, d2, d3):
+    """ a1*x + b1*y + c1*z = d1
+        a2*x + b2*y + c2*z = d2
+        a3*x + b3*y + c3*z = d3
+        | a1 b1 c1 |       | d1 b1 c1 |       | a1 d1 c1 |       | a1 b1 d1 |
+    ^ = | a2 b2 c2 |, ^1 = | d2 b2 c2 |, ^2 = | a2 d2 c2 |, ^3 = | a2 b2 d2 |
+        | a3 b3 c3 |       | d3 b3 c3 |       | a3 d3 c3 |       | a3 b3 d3 |
+        x
+    """
+    delta  = determinant33(a1, b1, c1, a2, b2, c2, a3, b3, c3)
+    delta1 = determinant33(d1, b1, c1, d2, b2, c2, d3, b3, c3)
+    delta2 = determinant33(a1, d1, c1, a2, d2, c2, a3, d3, c3)
+    delta3 = determinant33(a1, b1, d1, a2, b2, d2, a3, b3, d3)
+    print delta1, delta1, delta2, delta3
+    return (delta1/delta, delta2/delta, delta3/delta1)
+
 if __name__ == "__main__":
     import sys
     import os
@@ -547,7 +625,11 @@ if __name__ == "__main__":
 #    o.writeLog()
 
 #    p = POSCAR('POSCAR5C')
-    p = POSCAR('CONTCAR5')
-#    p = POSCAR('POSCAR4')
+
+#    p = POSCAR('Direct')
+#    p.directToCartesian()
+
+    p = POSCAR('Cartesian')
+    p.cartesianToDirect()
     p.writePOSCAR()
     pass
