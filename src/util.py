@@ -29,6 +29,7 @@ def poscar2gjf(poscar, gjf, elements = None):
         gjf:      {GJF}
         elements: {string array}
     """
+    poscar.directToCartesian()
     if elements != None:
         poscar.setElementsType(elements)
     for a in poscar._atoms_:

@@ -413,7 +413,7 @@ class POSCAR:
             for a in self._atoms_:
                 x, y, z = a.getCoordinate()
                 tmpX = 1/v1Len*x - cosGamma/v1Len/sinGamma*y + (cosAlpha*cosGamma - cosBeta)/v1Len/volume/sinGamma*z
-                tmpY = 1/v2Len*y + (cosBeta*cosGamma - cosAlpha)/v2Len/volume/sinGamma*z
+                tmpY = 1/v2Len/sinGamma*y + (cosBeta*cosGamma - cosAlpha)/v2Len/volume/sinGamma*z
                 tmpZ = sinGamma/v3Len/volume*z
 #                a.setCoordinate(tmpX/lc, tmpY/lc, tmpZ/lc)
                 a.setCoordinate(tmpX, tmpY, tmpZ)
@@ -594,28 +594,6 @@ class OUTCAR:
             f.close()
 #    
 
-def determinant33(a, b, c, d, e, f, g, h, i):
-    """ |a b c|
-        |d e f|
-        |g h i|
-    """
-    return a*(e*i - f*h) - d*(b*i - c*h) + g*(b*f - c*e)
-
-def linearEq3unkowns(a1, a2, a3, b1, b2, b3, c1, c2, c3, d1, d2, d3):
-    """ a1*x + b1*y + c1*z = d1
-        a2*x + b2*y + c2*z = d2
-        a3*x + b3*y + c3*z = d3
-        | a1 b1 c1 |       | d1 b1 c1 |       | a1 d1 c1 |       | a1 b1 d1 |
-    ^ = | a2 b2 c2 |, ^1 = | d2 b2 c2 |, ^2 = | a2 d2 c2 |, ^3 = | a2 b2 d2 |
-        | a3 b3 c3 |       | d3 b3 c3 |       | a3 d3 c3 |       | a3 b3 d3 |
-        x
-    """
-    delta  = determinant33(a1, b1, c1, a2, b2, c2, a3, b3, c3)
-    delta1 = determinant33(d1, b1, c1, d2, b2, c2, d3, b3, c3)
-    delta2 = determinant33(a1, d1, c1, a2, d2, c2, a3, d3, c3)
-    delta3 = determinant33(a1, b1, d1, a2, b2, d2, a3, b3, d3)
-    print delta1, delta1, delta2, delta3
-    return (delta1/delta, delta2/delta, delta3/delta1)
 
 if __name__ == "__main__":
     import sys
@@ -625,11 +603,12 @@ if __name__ == "__main__":
 #    o.writeLog()
 
 #    p = POSCAR('POSCAR5C')
-
-#    p = POSCAR('Direct')
-#    p.directToCartesian()
-
-    p = POSCAR('Cartesian')
+    p = POSCAR('c1')
     p.cartesianToDirect()
-    p.writePOSCAR()
+    p.writePOSCAR('d1')
+
+    p = POSCAR('d1')
+    p.directToCartesian()
+    p.writePOSCAR('c2')
+
     pass
