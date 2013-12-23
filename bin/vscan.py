@@ -98,6 +98,7 @@ def main():
         infile = sys.stdin.readline().rstrip()
 #        infile = checkFile(sys.stdin.readline().rstrip())
     poscar = POSCAR(infile)
+    poscar.directToCartesian()
     if elements != None:
         poscar.setElementsType(elements)
 

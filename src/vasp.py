@@ -365,8 +365,8 @@ class POSCAR:
             v2 = l[1]
             v3 = l[2]
             alpha = v2.getAngle(v3)
-            beta  = v1.getAngle(v2)
-            gamma = v1.getAngle(v3)
+            beta  = v1.getAngle(v3)
+            gamma = v1.getAngle(v2)
             v1Len = v1.getLength()
             v2Len = v2.getLength()
             v3Len = v3.getLength()
@@ -397,8 +397,8 @@ class POSCAR:
             v2 = l[1]
             v3 = l[2]
             alpha = v2.getAngle(v3)
-            beta  = v1.getAngle(v2)
-            gamma = v1.getAngle(v3)
+            beta  = v1.getAngle(v3)
+            gamma = v1.getAngle(v2)
             v1Len = v1.getLength()
             v2Len = v2.getLength()
             v3Len = v3.getLength()
