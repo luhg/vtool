@@ -186,8 +186,10 @@ class POSCAR:
     def writePOSCAR(self, filename = None):
         comment = ''
         numberOfAtom = ''
+        atomOfType = ''
+
         for es in self._checkElements_():
-            comment += ' ' + es.keys()[0]
+            atomOfType += ' ' + es.keys()[0]
             numberOfAtom += ' ' + str(es.values()[0])
 
         l = self._lattice_.getVectors()
@@ -206,7 +208,12 @@ class POSCAR:
                              v31, v32, v33)
 
 
-        output2 = numberOfAtom + "\n"
+        if atomOfType.split()[0].istitle():
+            output2 = atomOfType + "\n"
+            output2 += numberOfAtom + "\n"
+        else:
+            output2 = numberOfAtom + "\n"
+#        output2 = numberOfAtom + "\n"
 #        output += numberOfAtom + "\n"
 
         output3 = ""
