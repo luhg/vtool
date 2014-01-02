@@ -422,8 +422,8 @@ class POSCAR:
                 tmpX = 1/v1Len*x - cosGamma/v1Len/sinGamma*y + (cosAlpha*cosGamma - cosBeta)/v1Len/volume/sinGamma*z
                 tmpY = 1/v2Len/sinGamma*y + (cosBeta*cosGamma - cosAlpha)/v2Len/volume/sinGamma*z
                 tmpZ = sinGamma/v3Len/volume*z
-#                a.setCoordinate(tmpX/lc, tmpY/lc, tmpZ/lc)
                 a.setCoordinate(tmpX, tmpY, tmpZ)
+#                a.setCoordinate(tmpX/lc, tmpY/lc, tmpZ/lc)
             
 
 
@@ -443,9 +443,8 @@ class OUTCAR:
         rePosition = re.compile('^\s+?position of ions in cartesian coordinates')
 #        rePosition2 = re.compile('^\s+?(\w+)\s+?(\w+)\s+?(\w+)')
         reDynMat = re.compile('Eigenvectors and eigenvalues of the dynamical matrix')
+        reFinite = re.compile('Finite differences POTIM')
 
-#        for l in f.readlines():
-#            print l
         totalAtomNumber = 0
         while l:
             l = f.readline()
@@ -453,24 +452,22 @@ class OUTCAR:
             if rePOTCAR.search(l):
                 r = rePOTCAR.match(l)
                 e1, e2, e3 = r.groups()
-#                print l, e1, e2, e3
                 element = {'potential': e1, 'element': e2, 'date': e3}
                 self._elements_.append(element)
 
             # Get atom position
             if rePosition.match(l):
-#                print l.rstrip()
                 l = f.readline()
                 while not reSpace.search(l):
                     l = f.readline()
-#                    print l.rstrip(), totalAtomNumber
                     totalAtomNumber += 1
                     
 
             # Get dynamical matrix
             if reDynMat.search(l):
                 l = f.readline()
-                while not reDynMat.search(l):
+#                while not reDynMat.search(l):
+                while not (reDynMat.search(l) or reFinite.search(l) ):
                     tmpArray = l.split()
                     # Get image freq
                     if len(tmpArray) == 10:
@@ -487,13 +484,13 @@ class OUTCAR:
                                 l = f.readline()
                                 tmpArray = l.split()
                             else:
-                                tmpAtm = Atom(element = 0,
+#                                tmpAtm = Atom(element = 0,
+                                tmpAtm = Atom(elementSymbol = 'X',
                                               xCoordinate = float(tmpArray[0]), yCoordinate = float(tmpArray[1]), zCoordinate = float(tmpArray[2]),
                                               xDisplace = float(tmpArray[3]), yDisplace = float(tmpArray[4]), zDisplace = float(tmpArray[3]) )
                                 l = f.readline()
                                 tmpArray = l.split()
                                 atoms.append(tmpAtm)
-#                            print l.rstrip()
                         self._dynamicMatrixes_.append({"freq": freq, "atoms": atoms})
 
                     # Get real freq
@@ -511,7 +508,8 @@ class OUTCAR:
                                 l = f.readline()
                                 tmpArray = l.split()
                             else:
-                                tmpAtm = Atom(element = 0,
+#                                tmpAtm = Atom(element = 0,
+                                tmpAtm = Atom(elementSymbol = 'X',
                                               xCoordinate = float(tmpArray[0]), yCoordinate = float(tmpArray[1]), zCoordinate = float(tmpArray[2]),
                                               xDisplace = float(tmpArray[3]), yDisplace = float(tmpArray[4]), zDisplace = float(tmpArray[3]) )
                                 l = f.readline()
