@@ -10,7 +10,7 @@ __date__ = "2013/11/25"
 __version__ = "$Revision: 0.1$"
 
 
-def makeScanJob(poscars):
+def makeScanJob(poscars, elements = None):
     i = 0
     g = GJF()
     for p in poscars:
@@ -142,7 +142,7 @@ def main():
         print "input error of reference atom"
         sys.exit(2)
 
-    makeScanJob(poscars)
+    makeScanJob(poscars, elements)
 
 
 if __name__ == "__main__":

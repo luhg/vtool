@@ -302,7 +302,8 @@ class POSCAR:
     
     #        for j in grp_indexes:
             for j in tmpIndexes:
-                tmpX, tmpY, tmpZ = poscar._atoms_[j].getCoordinate()
+#                tmpX, tmpY, tmpZ = poscar._atoms_[j].getCoordinate()
+                tmpX, tmpY, tmpZ = self._atoms_[j].getCoordinate()
                 tmpV = Vector(tmpX - x2, tmpY - y2, tmpZ - z2)
                 tmpV = tmpV.rotate(normal_vector, a)
                 tmpX, tmpY, tmpZ = tmpV.getBasis()
@@ -349,7 +350,8 @@ class POSCAR:
             tmpPOSCAR._atoms_ = copy.deepcopy(self._atoms_)
     
             for j in tmpIndexes:
-                tmpX, tmpY, tmpZ = poscar._atoms_[j].getCoordinate()
+#                tmpX, tmpY, tmpZ = poscar._atoms_[j].getCoordinate()
+                tmpX, tmpY, tmpZ = self._atoms_[j].getCoordinate()
                 tmpV = Vector(tmpX - x3, tmpY - y3, tmpZ - z3)
                 tmpV = tmpV.rotate(normal_vec3, a)
                 tmpX, tmpY, tmpZ = tmpV.getBasis()
