@@ -439,8 +439,9 @@ class OUTCAR:
         f = open(filename)
         l = ' '
         reSpace = re.compile('^\s+?$')
-#        reSpace = re.compile('^\s+?$')
         rePOTCAR = re.compile('^\s+?POTCAR:\s+?(\w+)\s+?(\w+)\s+?(\w+)')
+        reTITEL = re.compile('^\s+?TITEL\s+?=\s+?(\w+)\s+?(\w+)\s+?(\w+)')
+        reAtomOfType = re.compile('^\s+?ions per type =')
 #        rePosition = re.compile(' position of ions in cartesian coordinates  (Angst):')
         rePosition = re.compile('^\s+?position of ions in cartesian coordinates')
 #        rePosition2 = re.compile('^\s+?(\w+)\s+?(\w+)\s+?(\w+)')
@@ -448,21 +449,36 @@ class OUTCAR:
         reFinite = re.compile('Finite differences POTIM')
 
         totalAtomNumber = 0
+        tmpElements = []
         while l:
             l = f.readline()
             # Get potcar
-            if rePOTCAR.search(l):
-                r = rePOTCAR.match(l)
+#            if rePOTCAR.search(l):
+#                r = rePOTCAR.match(l)
+#                e1, e2, e3 = r.groups()
+#                element = {'potential': e1, 'element': e2, 'date': e3}
+#                self._elements_.append(element)
+            if reTITEL.search(l):
+                r = reTITEL.match(l)
                 e1, e2, e3 = r.groups()
                 element = {'potential': e1, 'element': e2, 'date': e3}
                 self._elements_.append(element)
 
+            # Get atom type number
+            if reAtomOfType.search(l):
+                 tmpArray = l.split()
+                 for i in xrange(len(tmpArray) - 4):
+#                     print int(tmpArray[i+4])
+                     self._elements_[i]['number'] = int(tmpArray[i+4])
+                     for j in xrange(int(tmpArray[i+4])):
+                         tmpElements.append(self._elements_[i]['element'])
+
             # Get atom position
-            if rePosition.match(l):
-                l = f.readline()
-                while not reSpace.search(l):
-                    l = f.readline()
-                    totalAtomNumber += 1
+#            if rePosition.match(l):
+#                l = f.readline()
+#                while not reSpace.search(l):
+#                    l = f.readline()
+#                    totalAtomNumber += 1
                     
 
             # Get dynamical matrix
@@ -473,6 +489,7 @@ class OUTCAR:
                     tmpArray = l.split()
                     # Get image freq
                     if len(tmpArray) == 10:
+                        i = 0
                         freq = {"THz": float(tmpArray[2]) * -1.0,
                                 "2PiTHz": float(tmpArray[4]) * 1.0,
                                 "cm-1": float(tmpArray[6]) * -1.0,
@@ -487,16 +504,20 @@ class OUTCAR:
                                 tmpArray = l.split()
                             else:
 #                                tmpAtm = Atom(element = 0,
-                                tmpAtm = Atom(elementSymbol = 'X',
+#                                tmpAtm = Atom(elementSymbol = 'X',
+                                tmpAtm = Atom(elementSymbol = tmpElements[i],
                                               xCoordinate = float(tmpArray[0]), yCoordinate = float(tmpArray[1]), zCoordinate = float(tmpArray[2]),
                                               xDisplace = float(tmpArray[3]), yDisplace = float(tmpArray[4]), zDisplace = float(tmpArray[3]) )
                                 l = f.readline()
                                 tmpArray = l.split()
+                                checkElementByPeriodicTable(tmpAtm)
                                 atoms.append(tmpAtm)
+                                i += 1
                         self._dynamicMatrixes_.append({"freq": freq, "atoms": atoms})
 
                     # Get real freq
                     elif len(tmpArray) == 11:
+                        i = 0
                         freq = {"THz": float(tmpArray[3]),
                                 "2PiTHz": float(tmpArray[5]),
                                 "cm-1": float(tmpArray[7]),
@@ -511,12 +532,15 @@ class OUTCAR:
                                 tmpArray = l.split()
                             else:
 #                                tmpAtm = Atom(element = 0,
-                                tmpAtm = Atom(elementSymbol = 'X',
+#                                tmpAtm = Atom(elementSymbol = 'X',
+                                tmpAtm = Atom(elementSymbol = tmpElements[i],
                                               xCoordinate = float(tmpArray[0]), yCoordinate = float(tmpArray[1]), zCoordinate = float(tmpArray[2]),
                                               xDisplace = float(tmpArray[3]), yDisplace = float(tmpArray[4]), zDisplace = float(tmpArray[3]) )
                                 l = f.readline()
                                 tmpArray = l.split()
+                                checkElementByPeriodicTable(tmpAtm)
                                 atoms.append(tmpAtm)
+                                i += 1
 #                            print l.rstrip()
                         self._dynamicMatrixes_.append({"freq": freq, "atoms": atoms})
  
@@ -562,7 +586,8 @@ class OUTCAR:
 
         for i in range(numberOfAtoms):
             x, y, z = self._dynamicMatrixes_[0]['atoms'][i].getCoordinate()
-            out += sentances[0]['coordinates'] %(i+1, 1, 0, x, y, z)
+#            out += sentances[0]['coordinates'] %(i+1, 1, 0, x, y, z)
+            out += sentances[0]['coordinates'] %(i+1, self._dynamicMatrixes_[0]['atoms'][i].getAtomicNumber(), 0, x, y, z)
         out += sentances[0]['dash']
  
         out += sentances[0]['frequency']
@@ -606,16 +631,16 @@ if __name__ == "__main__":
     import sys
     import os
 
-#    o = OUTCAR('OUTCAR')
-#    o.writeLog()
+    o = OUTCAR('OUTCAR46')
+    o.writeLog()
 
 #    p = POSCAR('POSCAR5C')
-    p = POSCAR('c1')
-    p.cartesianToDirect()
-    p.writePOSCAR('d1')
+#    p = POSCAR('c1')
+#    p.cartesianToDirect()
+#    p.writePOSCAR('d1')
 
-    p = POSCAR('d1')
-    p.directToCartesian()
-    p.writePOSCAR('c2')
+#    p = POSCAR('d1')
+#    p.directToCartesian()
+#    p.writePOSCAR('c2')
 
     pass
