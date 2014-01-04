@@ -105,10 +105,12 @@ class Lattice():
         return self._constant_
 
     def setVectors(self, v1, v2, v3):
-        self._Vectors_ = [v1, v2, v3]
+#        self._Vectors_ = [v1, v2, v3]
+        self._vectors_ = [v1, v2, v3]
 
     def getVectors(self):
-        return self._Vectors_
+#        return self._Vectors_
+        return self._vectors_
 
 
 class Element:

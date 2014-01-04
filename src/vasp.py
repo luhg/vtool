@@ -432,16 +432,30 @@ class POSCAR:
 class OUTCAR:
     def __init__(self, filename = 'OUTCAR'):
         self._elements_ = []
+        self._lattices_ = []
         self._dynamicMatrixes_ = []
         self.readOUTCAR(filename)
 
     def readOUTCAR(self, filename):
         f = open(filename)
         l = ' '
+        # global reg pattern
         reSpace = re.compile('^\s+?$')
+        reDivisionLine = re.compile('--------------------------------------------------------------------------------------------------------')
+
+        # INCAR section pattern
+        reINCAR = re.compile('^\s+?INCAR:')
         rePOTCAR = re.compile('^\s+?POTCAR:\s+?(\w+)\s+?(\w+)\s+?(\w+)')
         reTITEL = re.compile('^\s+?TITEL\s+?=\s+?(\w+)\s+?(\w+)\s+?(\w+)')
-        reAtomOfType = re.compile('^\s+?ions per type =')
+
+        # ios position section pattern
+        reIonPosition = re.compile('^\s+?ion  position')
+        reLatticeVectors = re.compile('^\s+?Lattice vectors:')
+        reVectorForm = re.compile('\s+?(\w+) = \(\s+?(-?(\d+)\.(\d+)),\s+?(-?(\d+)\.(\d+)),\s+?(-?(\d+)\.(\d+))\)')
+
+        # Dimension of arrays section pattern
+        reIonsPerType = re.compile('^\s+?ions per type =')
+
 #        rePosition = re.compile(' position of ions in cartesian coordinates  (Angst):')
         rePosition = re.compile('^\s+?position of ions in cartesian coordinates')
 #        rePosition2 = re.compile('^\s+?(\w+)\s+?(\w+)\s+?(\w+)')
@@ -452,6 +466,7 @@ class OUTCAR:
         tmpElements = []
         while l:
             l = f.readline()
+
             # Get potcar
 #            if rePOTCAR.search(l):
 #                r = rePOTCAR.match(l)
@@ -464,8 +479,32 @@ class OUTCAR:
                 element = {'potential': e1, 'element': e2, 'date': e3}
                 self._elements_.append(element)
 
+            # ion position section:
+            if reIonPosition.search(l):
+                while not reDivisionLine.search(l):
+                    l = f.readline()
+                    if reLatticeVectors.match(l):
+#                        tmpVectors = []
+                        l = f.readline()
+                        l = f.readline()
+                        r = reVectorForm.match(l)
+#                        print r.groups()[1], r.groups()[4], r.groups()[7]
+                        tmpVector1 = Vector(float(r.groups()[1]), float(r.groups()[4]), float(r.groups()[7]) )
+
+                        l = f.readline()
+                        r = reVectorForm.match(l)
+#                        print r.groups()[1], r.groups()[4], r.groups()[7]
+                        tmpVector2 = Vector(float(r.groups()[1]), float(r.groups()[4]), float(r.groups()[7]) )
+
+                        l = f.readline()
+                        r = reVectorForm.match(l)
+#                        print r.groups()[1], r.groups()[4], r.groups()[7]
+                        tmpVector3 = Vector(float(r.groups()[1]), float(r.groups()[4]), float(r.groups()[7]) )
+                        self._lattices_.append(Lattice(tmpVector1, tmpVector2, tmpVector3) )
+                l = f.readline()
+
             # Get atom type number
-            if reAtomOfType.search(l):
+            if reIonsPerType.search(l):
                  tmpArray = l.split()
                  for i in xrange(len(tmpArray) - 4):
 #                     print int(tmpArray[i+4])
@@ -586,9 +625,14 @@ class OUTCAR:
 
         for i in range(numberOfAtoms):
             x, y, z = self._dynamicMatrixes_[0]['atoms'][i].getCoordinate()
-#            out += sentances[0]['coordinates'] %(i+1, 1, 0, x, y, z)
-            out += sentances[0]['coordinates'] %(i+1, self._dynamicMatrixes_[0]['atoms'][i].getAtomicNumber(), 0, x, y, z)
+            out += sentances[0]['coordinates'] %(i + 1, self._dynamicMatrixes_[0]['atoms'][i].getAtomicNumber(), 0, x, y, z)
+
+        for i in range(3):
+            x, y, z = self._lattices_[0]._vectors_[i].getBasis()
+            out += sentances[0]['coordinates'] %(numberOfAtoms + i + 1, -2, 0, x, y, z)
+
         out += sentances[0]['dash']
+
  
         out += sentances[0]['frequency']
         for i in range(quotient):
@@ -631,7 +675,7 @@ if __name__ == "__main__":
     import sys
     import os
 
-    o = OUTCAR('OUTCAR46')
+    o = OUTCAR('OUTCAR52')
     o.writeLog()
 
 #    p = POSCAR('POSCAR5C')
