@@ -372,6 +372,7 @@ PERIODIC_TABLE_ElEMENTS = [Element(),
                            Element('Lv',  'Livermorium',   116, 293),
                            Element('Uus', 'Ununseptium',   117, 294),
                            Element('Uuo', 'Ununoctium',    118, 294),
+                           Element('Tv',  'Translation vectors', -2, 0), # Defined in Gaussian
                           ]
 
 def checkElementByPeriodicTable(element, method = 'symbol'):
