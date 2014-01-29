@@ -448,6 +448,10 @@ class OUTCAR:
         rePOTCAR = re.compile('^\s+?POTCAR:\s+?(\w+)\s+?(\w+)\s+?(\w+)')
         reTITEL = re.compile('^\s+?TITEL\s+?=\s+?(\w+)\s+?(\w+)\s+?(\w+)')
 
+        # finite differences section pattern
+        reFiniteDifferences = re.compile('^\s+?finite differences')
+        reDirectLatticeVectorsReciprocalLatticeVertors = re.compile('^\s+?direct\s+?lattice\s+?vectors\s+?reciprocal\s+?lattice\s+?vectors')
+
         # ios position section pattern
         reIonPosition = re.compile('^\s+?ion  position')
         reLatticeVectors = re.compile('^\s+?Lattice vectors:')
@@ -479,29 +483,55 @@ class OUTCAR:
                 element = {'potential': e1, 'element': e2, 'date': e3}
                 self._elements_.append(element)
 
-            # ion position section:
-            if reIonPosition.search(l):
-                while not reDivisionLine.search(l):
-                    l = f.readline()
-                    if reLatticeVectors.match(l):
-#                        tmpVectors = []
-                        l = f.readline()
-                        l = f.readline()
-                        r = reVectorForm.match(l)
-#                        print r.groups()[1], r.groups()[4], r.groups()[7]
-                        tmpVector1 = Vector(float(r.groups()[1]), float(r.groups()[4]), float(r.groups()[7]) )
-
-                        l = f.readline()
-                        r = reVectorForm.match(l)
-#                        print r.groups()[1], r.groups()[4], r.groups()[7]
-                        tmpVector2 = Vector(float(r.groups()[1]), float(r.groups()[4]), float(r.groups()[7]) )
-
-                        l = f.readline()
-                        r = reVectorForm.match(l)
-#                        print r.groups()[1], r.groups()[4], r.groups()[7]
-                        tmpVector3 = Vector(float(r.groups()[1]), float(r.groups()[4]), float(r.groups()[7]) )
-                        self._lattices_.append(Lattice(tmpVector1, tmpVector2, tmpVector3) )
+            #  finite differences section
+            if reFiniteDifferences.search(l):
                 l = f.readline()
+                tmpFlag = False
+                print "AAAA"
+                while not (tmpFlag and reDivisionLine.search(l) ):
+                    if reDivisionLine.search(l):
+                        tmpFlag = True
+                    if reDirectLatticeVectorsReciprocalLatticeVertors.search(l):
+                        l = f.readline()
+                        tmpArray = l.split()
+                        print tmpArray
+                        tmpVector1 = Vector(float(tmpArray[0]), float(tmpArray[1]), float(tmpArray[2]) )
+
+                        l = f.readline()
+                        tmpArray = l.split()
+                        print tmpArray
+                        tmpVector2 = Vector(float(tmpArray[0]), float(tmpArray[1]), float(tmpArray[2]) )
+
+                        l = f.readline()
+                        tmpArray = l.split()
+                        print tmpArray
+                        tmpVector3 = Vector(float(tmpArray[0]), float(tmpArray[1]), float(tmpArray[2]) )
+                        self._lattices_.append(Lattice(tmpVector1, tmpVector2, tmpVector3) )
+                    l = f.readline()
+
+#            # ion position section:
+#            if reIonPosition.search(l):
+#                while not reDivisionLine.search(l):
+#                    l = f.readline()
+#                    if reLatticeVectors.match(l):
+##                        tmpVectors = []
+#                        l = f.readline()
+#                        l = f.readline()
+#                        r = reVectorForm.match(l)
+##                        print r.groups()[1], r.groups()[4], r.groups()[7]
+#                        tmpVector1 = Vector(float(r.groups()[1]), float(r.groups()[4]), float(r.groups()[7]) )
+#
+#                        l = f.readline()
+#                        r = reVectorForm.match(l)
+##                        print r.groups()[1], r.groups()[4], r.groups()[7]
+#                        tmpVector2 = Vector(float(r.groups()[1]), float(r.groups()[4]), float(r.groups()[7]) )
+#
+#                        l = f.readline()
+#                        r = reVectorForm.match(l)
+##                        print r.groups()[1], r.groups()[4], r.groups()[7]
+#                        tmpVector3 = Vector(float(r.groups()[1]), float(r.groups()[4]), float(r.groups()[7]) )
+#                        self._lattices_.append(Lattice(tmpVector1, tmpVector2, tmpVector3) )
+#                l = f.readline()
 
             # Get atom type number
             if reIonsPerType.search(l):
@@ -675,8 +705,8 @@ if __name__ == "__main__":
     import sys
     import os
 
-    o = OUTCAR('OUTCAR52')
-    o.writeLog()
+#    o = OUTCAR('OUTCAR52')
+#    o.writeLog()
 
 #    p = POSCAR('POSCAR5C')
 #    p = POSCAR('c1')
