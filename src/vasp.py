@@ -666,7 +666,7 @@ class OUTCAR:
  
         out += sentances[0]['frequency']
         for i in range(1, quotient+1):
-            out += sentances[3]['number'] %(3*i+1, 3*i+2, 3*i+3)
+            out += sentances[3]['number'] %(3*i-2, 3*i-1, 3*i)
             out += sentances[3]['frequency'] %(self._dynamicMatrixes_[3*i-3]['freq']['cm-1'], self._dynamicMatrixes_[3*i-2]['freq']['cm-1'], self._dynamicMatrixes_[3*i-1]['freq']['cm-1'])
             out += sentances[3]['title']
             for j in range(numberOfAtoms):
