@@ -487,24 +487,20 @@ class OUTCAR:
             if reFiniteDifferences.search(l):
                 l = f.readline()
                 tmpFlag = False
-                print "AAAA"
                 while not (tmpFlag and reDivisionLine.search(l) ):
                     if reDivisionLine.search(l):
                         tmpFlag = True
                     if reDirectLatticeVectorsReciprocalLatticeVertors.search(l):
                         l = f.readline()
                         tmpArray = l.split()
-                        print tmpArray
                         tmpVector1 = Vector(float(tmpArray[0]), float(tmpArray[1]), float(tmpArray[2]) )
 
                         l = f.readline()
                         tmpArray = l.split()
-                        print tmpArray
                         tmpVector2 = Vector(float(tmpArray[0]), float(tmpArray[1]), float(tmpArray[2]) )
 
                         l = f.readline()
                         tmpArray = l.split()
-                        print tmpArray
                         tmpVector3 = Vector(float(tmpArray[0]), float(tmpArray[1]), float(tmpArray[2]) )
                         self._lattices_.append(Lattice(tmpVector1, tmpVector2, tmpVector3) )
                     l = f.readline()
@@ -616,6 +612,7 @@ class OUTCAR:
                     l = f.readline()
                 
         f.close()
+        self._dynamicMatrixes_.reverse()
 
     def writeLog(self, filename = None):
         out0orientation = """                         Standard orientation:
